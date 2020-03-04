@@ -14,34 +14,6 @@
 	var userpass="";
     var imgReg=/http:\/\/nip\.tsatu\.edu\.ua\/pluginfile\.php\/([0-9]{0,9})\/question\/answer\/([0-9]{0,9})\/([0-9]{0,9})\/([0-9]{0,9})\//;
     // cursor: copy;
-
-    /*
-*************************************************************************
- Q - "finish test"
- W - "override finish test"
- E - "Next" key
- R - (NONE)
- T - (NONE)
- Y - Replace & delete images
- U - Show / hide upload form
- I - Merge answers to LocalStorage
- O -
- P - highlight the correct
- A - (NONE)
- S - (NONE)
- D -
- F - (NONE)
- G - Random answer & next
- H - Save results to file
- J - Save results to LocalStorage
- K -
- L - Login as "v_tishyn"
-
-localStorage.setItem('testgb', 1);
-
-localStorage.getItem('testgb');
-*************************************************************************
-*/
     function unique(arr) {
         let result = [];
 
@@ -72,26 +44,18 @@ localStorage.getItem('testgb');
 
     function mergeAnswers(a,b){
 
-        //console.log('start-merge');
-        //console.log('a:'+a.length);
-        //console.log('b:'+b.length);
         var result=Array();
         var i,j;
         var addThis=true;
         for(i=0;i<a.length;i++){
-            //console.log('i:'+i);
             addThis=true;
             for(j=0;j<b.length;j++){
-                //console.log('j:'+j);
                 if(addThis){
                     if (b[j][0].includes(a[i][0])) {
-                        //console.log('find');
                         b[j][1]=b[j][1].concat(a[i][1]);
                         b[j][2]=b[j][2].concat(a[i][2]);
                         b[j][3]=b[j][3].concat(a[i][3]);
-                        //merge
                         addThis=false;
-                        //break;
                     }
                 }
             }
@@ -106,15 +70,12 @@ localStorage.getItem('testgb');
 
     function highlightRightAnswers(){
 
-        //console.log('start-gb');
-
         content=new Array();
         var part=document.querySelector('.que');
 
         //img filter
         var img=part.querySelectorAll('img');
         img.forEach((im) => {
-            //document.querySelectorAll('.que .content')[0].querySelectorAll('img')[0].attributes['src']
             var imgSr=im.attributes.src.value.replace(imgReg,'');
 
             im.outerHTML='[['+imgSr+']]';
@@ -161,24 +122,21 @@ localStorage.getItem('testgb');
                 for(i=0;i<ansHH[2].length;i++){
                     console.log(ansHH[2][i]);
                     if((answ.localeCompare(ansHH[2][i]))==0) {
-                        //console.log('Find+');
+                        //correct
                         answo.style="background:#00ff0c";
                     }
                 }
                 for(i=0;i<ansHH[3].length;i++){
                     console.log(ansHH[3][i]);
                     if((answ.localeCompare(ansHH[3][i]))==0) {
-                        //console.log('Find-');
+                        //incorrect
                         answo.style="background:#ff7a7a";
                     }
                 }
             });
         }
-        //alert(Question.innerHTML);
         return content;
     }
-
-    //****************************************************************************************---------------------------------
 
     function parseFinish(){
 
@@ -196,7 +154,6 @@ localStorage.getItem('testgb');
             //img filter
             var img=part.querySelectorAll('img');
             img.forEach((im) => {
-                //document.querySelectorAll('.que .content')[0].querySelectorAll('img')[0].attributes['src']
                 var imgSr=im.attributes.src.value.replace(imgReg,'');
 
                 im.outerHTML='[['+imgSr+']]';
@@ -211,8 +168,6 @@ localStorage.getItem('testgb');
             var RightAnswered=new Array();
             var NonRightAnswered=new Array();
             Answers.forEach((element) => {
-                //element.querySelector('input').remove();
-
                 //http:\/\/nip\.tsatu\.edu\.ua\/pluginfile\.php\/([0-9]{0,9})\/question\/answer\/([0-9]{0,9})\/([0-9]{0,9})\/([0-9]{0,9})\/
 
                 var answ=filtAnsw(element.querySelector('label').innerHTML);
@@ -267,6 +222,7 @@ localStorage.getItem('testgb');
         document.body.removeChild(element);
     }
 
+	//TODO: 
     /**
  * @param {string} s1 Исходная строка
  * @param {string} s2 Сравниваемая строка
@@ -317,6 +273,7 @@ localStorage.getItem('testgb');
     if (typeof unsafeWindow != undefined) { w = unsafeWindow } else { w = window; }
     if (w.self != w.top) { return; }
 
+	//TODO: 
 /* // in future
     var newDiv = document.createElement("div");
     newDiv.style="display:none;position:absolute;left:0;top:0;z-index: 99999;";
@@ -335,9 +292,7 @@ localStorage.getItem('testgb');
     if (/http:\/\/nip\.tsatu\.edu\.ua\/mod\/quiz\/summary.php/.test(w.location.href)) {
 
         //Press keys in end of test
-
         document.addEventListener('keydown', function(event) {
-
             if (event.code == 'KeyS') {
                 document.querySelector("[value=\"Відправити все та завершити\"]").click();
             }
@@ -345,7 +300,6 @@ localStorage.getItem('testgb');
             if (event.code == 'KeyD') {
                 document.querySelector(".moodle-dialogue input").click();
             }
-
         });
 
     }
@@ -361,8 +315,6 @@ localStorage.getItem('testgb');
     else {
         if (/http:\/\/nip\.tsatu\.edu\.ua/.test(w.location.href)) {
             document.addEventListener('keydown', function(event) {
-
-
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Replace & delete images
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,7 +324,6 @@ localStorage.getItem('testgb');
                     Questions=document.querySelectorAll('.que .content');
 
                     Questions.forEach((part) => {
-
                         //service icon filter
                         var simg=part.querySelectorAll('.questioncorrectnessicon');
                         simg.forEach((im) => {
@@ -384,7 +335,6 @@ localStorage.getItem('testgb');
                         img.forEach((im) => {
                             //document.querySelectorAll('.que .content')[0].querySelectorAll('img')[0].attributes['src']
                             var imgSr=im.attributes.src.value.replace(imgReg,'');
-
                             im.outerHTML='[['+imgSr+']]';
                         });
                     });
@@ -393,7 +343,8 @@ localStorage.getItem('testgb');
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Show / hide upload form
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                /*
+                //TODO: upload answers
+		/*
                 if (event.code == 'KeyU') {
                     if(document.querySelector('#hfileinp').style.display=="none") {
                         document.querySelector('#hfileinp').style.display="block";
@@ -436,7 +387,7 @@ localStorage.getItem('testgb');
                             selected[rp].click();
                             document.querySelectorAll(".mod_quiz-next-nav")[0].click();
                         }else{
-                            alert("Find :0a");
+                            alert("Error: can't determine type of question");
                         }
                     }
                 }
@@ -446,10 +397,10 @@ localStorage.getItem('testgb');
                 // Press "Next" / "Prev" key
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                if (event.code == 'KeyE') {
+                if (event.code == 'KeyE') { // Next
                     document.querySelector(".mod_quiz-next-nav").click();
                 }
-                if (event.code == 'KeyC') {
+                if (event.code == 'KeyA') { // Prev
                     document.querySelector(".mod_quiz-prev-nav").click();
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
