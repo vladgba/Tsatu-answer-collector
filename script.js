@@ -12,7 +12,7 @@
 
 	var userlogin="";
 	var userpass="";
-    var imgReg=/http:\/\/nip\.tsatu\.edu\.ua\/pluginfile\.php\/([0-9]{0,9})\/question\/answer\/([0-9]{0,9})\/([0-9]{0,9})\/([0-9]{0,9})\//;
+    var imgReg=/http:\/\/nip\.tsatu\.edu\.ua\/pluginfile\.php\/([0-9]{0,9})\/question\/([a-z]{0,9})\/([0-9]{0,9})\/([0-9]{0,9})\/([0-9]{0,9})\//;
     // cursor: copy;
     function unique(arr) {
         let result = [];
