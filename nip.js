@@ -1,42 +1,47 @@
 // ==UserScript==
-// @name Def.Tdatu
+// @name nip.Tsatu-v2
 // @description Tsatu
 // @author Vlad Tishyn
 // @license MIT
 // @version 1.0
 // @include http://nip.tsatu.edu.ua/*
-// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // ==/UserScript==
-(function(window, undefined) {
-
-    var userlogin = "";
-    var userpass = "";
-    var imgReg = /http:\/\/nip\.tsatu\.edu\.ua\/pluginfile\.php\/([0-9]{0,9})\/question\/([a-z]{0,20})\/([0-9]{0,9})\/([0-9]{0,9})\/([0-9]{0,9})\//;
+(function() {
+    'use strict';
+    var userlogin = '',
+        userpass = '';
+    var w;
+    var Questions;
+    if (typeof unsafeWindow != undefined) {
+        w = unsafeWindow;
+    } else {
+        w = window;
+    }
+    if (w.self != w.top) {
+        return;
+    }
     /*
-*************************************************************************
-localStorage.setItem('testgb', 1);
-
-localStorage.getItem('testgb');
-*************************************************************************
-*/
+    Block - q [a ra ba]
+    */
     function unique(arr) {
         let result = [];
-
         for (let str of arr) {
             if (!result.includes(str)) {
                 result.push(str);
             }
         }
-
         return result;
     }
 
-    function filtAnsw(a) {
+    function filterQue(a) {
+        return a.trim().replace(/\.$/, '');
+    }
+
+    function filterAnswer(a) {
         return a.replace(/^([a-z])\. /, '').trim().replace(/\.$/, '');
     }
 
-    function filterAnswers(arr) {
-
+    function filterBlocks(arr) {
         arr.forEach(function(cval, i, array) {
             cval[1] = unique(cval[1]);
             cval[2] = unique(cval[2]);
@@ -45,33 +50,20 @@ localStorage.getItem('testgb');
         return arr;
     }
 
-    function mergeAnswers(a, b) {
-
-        //console.log('start-merge');
-        //console.log('a:'+a.length);
-        //console.log('b:'+b.length);
+    function mergeBlocks(a, b) {
         var result = Array();
         var i, j;
         var addThis = true;
-        if (b == null) {
-            b = Array();
-        }
+        if (b == null) b = Array();
         for (i = 0; i < a.length; i++) {
-            //console.log('i:'+i);
             addThis = true;
-            console.log(a);
-
             for (j = 0; j < b.length; j++) {
-                //console.log('j:'+j);
                 if (addThis) {
                     if (b[j][0].includes(a[i][0])) {
-                        //console.log('find');
                         b[j][1] = b[j][1].concat(a[i][1]);
                         b[j][2] = b[j][2].concat(a[i][2]);
                         b[j][3] = b[j][3].concat(a[i][3]);
-                        //merge
                         addThis = false;
-                        //break;
                     }
                 }
             }
@@ -79,224 +71,34 @@ localStorage.getItem('testgb');
                 result.push(a[i]);
             }
         }
-
         return result.concat(b);
     }
-    ////////////////////////********************************************************------------------------------
 
-    function highlightRightAnswers() {
-
-        content = new Array();
-
-        //Patch v1.2
-        //var part=document.querySelector('.que');
-        var partis = document.querySelectorAll('.que');
-        partis.forEach((part) => {
-            //Patch v1.2
-
-            //img filter
-            var img = part.querySelectorAll('img');
-            img.forEach((im) => {
-                //document.querySelectorAll('.que .content')[0].querySelectorAll('img')[0].attributes['src']
-                var imgSr = im.attributes.src.value.replace(imgReg, '');
-
-                im.outerHTML = '[[' + imgSr + ']]';
-            });
-
-            //select inner
-            var parts = part.querySelector('.formulation');
-            var ans = new Array();
-            var Quest = parts.querySelector('.qtext');
-
-            //Patch v1.2.2
-            //.replace(/<[^>]+>/g,'')
-            var Question = Quest.innerHTML.replace(/<[^>]+>/g, '');
-
-
-            //answers array
-            var Answers = parts.querySelectorAll('.formulation .r0, .formulation .r1');
-
-            //load answers from storage
-            var answRight = JSON.parse(localStorage.getItem('testgb'));
-
-            console.log(answRight);
-            var patchSelected = false;
-            var patchId;
-            var ansHH = Array();
-
-            //Patch 1.2
-            var answinpt = part.querySelector('input[type="text"]');
-            console.log(answinpt);
-
-            //Search question
-            for (var i = 0; i < answRight.length; i++) {
-
-                //Patch v1.2.2
-                //.replace(/<[^>]+>/g,'')
-                if ((Question.localeCompare(answRight[i][0].replace(/<[^>]+>/g, ''))) == 0) {
-                    Quest.style = "background:#00ff0c";
-                    patchSelected = true;
-                    ansHH = answRight[i];
-
-                    console.log("Answer");
-                    console.log(answRight[i][2]);
-                    //Patch v1.2.1b (works)
-                    if (answinpt != null) {
-                        answinpt.value = ansHH[2][0];
-                    }
-
-                    break;
-                } else {
-                    Quest.style = "background:#0000ff";
-                }
-
-            };
-            if (patchSelected) {
-                Answers.forEach((element) => {
-                    var answch = element.querySelector('input');
-                    var answo = element.querySelector('label');
-
-                    //Patch v1.2.2
-                    //.replace(/<[^>]+>/g,'')
-                    var answ = filtAnsw(answo.innerHTML);
-
-                    console.log('----------');
-                    console.log(imgReg);
-                    answ = answ.replace(imgReg, ''); //.replace(/<[^>]+>/g,'');
-                    console.log(answ);
-                    answ = answ.replace(imgReg, '').replace(/<[^>]+>/g, '');
-                    console.log(answ);
-
-                    //console.log('----------');
-                    //console.log(answ);
-                    /*
-                for(var i=0;i<ansHH[2].length;i++){
-                    console.log(ansHH[2][i]);
-                    if((answ.localeCompare(ansHH[2][i]))==0) {
-                        answo.style="background:#00ff0c";
-                    }
-                }*/
-
-                    var i;
-
-                    for (i = 0; i < ansHH[2].length; i++) {
-                        console.log(ansHH[2][i]);
-
-                        if ((answ.localeCompare(ansHH[2][i].replace(/<[^>]+>/g, ''))) == 0) {
-                            //console.log('Find+');
-
-                            //Patch v1.2
-                            if (answinpt == null) {
-                                answch.click();
-                            }
-
-                            answo.style = "background:#00ff0c";
-                        }
-                    }
-                    for (i = 0; i < ansHH[3].length; i++) {
-                        console.log(ansHH[3][i]);
-                        if ((answ.localeCompare(ansHH[3][i].replace(/<[^>]+>/g, ''))) == 0) {
-                            //console.log('Find-');
-                            answo.style = "background:#ff7a7a";
-                        }
-                    }
-                });
-            }
-
-            //Patch v1.2
-        });
-
-        //alert(Question.innerHTML);
-        return content;
+    function createView() {
+        var canvas = document.createElement("canvas");
+        canvas.id = 'canv';
+        canvas.style = "border:black solid;display:none;";
+        document.body.appendChild(canvas);
+        return canvas;
     }
 
-    //****************************************************************************************---------------------------------
-
-    function parseFinish() {
-
-        content = new Array();
-        Questions = document.querySelectorAll('.que');
-
-        Questions.forEach((part) => {
-
-            //service icon filter
-            var simg = part.querySelectorAll('.questioncorrectnessicon');
-            simg.forEach((im) => {
-                im.remove();
+    function getImg(c, im) {
+        var context = c.getContext('2d');
+        if (!im.complete) {
+            im.addEventListener('load', function(e) {
+                return done();
             });
+        } else {
+            return done();
+        }
 
-            //img filter
-            var img = part.querySelectorAll('img');
-            img.forEach((im) => {
-                //document.querySelectorAll('.que .content')[0].querySelectorAll('img')[0].attributes['src']
-                var imgSr = im.attributes.src.value.replace(imgReg, '');
-
-                im.outerHTML = '[[' + imgSr + ']]';
-            });
-
-            var parts = part.querySelector('.formulation');
-            var ans = new Array();
-
-            //Patch v1.2.2
-            //.replace(/<[^>]+>/g,'')
-            var Question = parts.querySelector('.qtext').innerHTML.replace(/<[^>]+>/g, '');
-
-            var Answers = parts.querySelectorAll('.formulation .r0, .formulation .r1');
-
-            var RightAnswer;
-            var RightAnswered = new Array();
-            var NonRightAnswered = new Array();
-            Answers.forEach((element) => {
-                //element.querySelector('input').remove();
-
-                //http:\/\/nip\.tsatu\.edu\.ua\/pluginfile\.php\/([0-9]{0,9})\/question\/answer\/([0-9]{0,9})\/([0-9]{0,9})\/([0-9]{0,9})\/
-
-                var answ = filtAnsw(element.querySelector('label').innerHTML);
-
-                //Patch v1.2.2
-                answ = answ.replace(imgReg, '').replace(/<[^>]+>/g, '');
-
-                //incorrect
-                if (element.classList.contains('incorrect')) {
-                    NonRightAnswered.push(answ);
-                }
-
-                //correct
-                if (element.classList.contains('correct')) {
-                    RightAnswered.push(answ);
-                }
-
-                //check grade
-                if (element.querySelector('input[checked="checked"]')) {
-                    if ((part.querySelector('.grade').innerHTML.localeCompare('Балів 1,00 з 1,00')) == 0) {
-                        RightAnswered.push(answ);
-                    }
-                    if ((part.querySelector('.grade').innerHTML.localeCompare('Балів 0,00 з 1,00')) == 0) {
-                        NonRightAnswered.push(answ);
-                    }
-                    //<div class="grade">Балів 1,00 з 1,00</div>
-                    //<div class="grade">Балів 0,00 з 1,00</div>
-                }
-                ans.push(answ);
-            });
-
-            var rAnsw = part.querySelector('.rightanswer');
-
-            if (rAnsw == null) {
-
-            } else {
-                //Ваша відповідь (не )?правильна
-                RightAnswer = rAnsw.innerHTML.replace(new RegExp('Правильна відповідь: '), '').replace(new RegExp('Ваша відповідь (не )?правильна'), '');
-
-                //Patch v1.2.2
-                RightAnswer = RightAnswer.replace(imgReg, '').replace(/<[^>]+>/g, '');
-                RightAnswered.push(RightAnswer);
-            }
-            content.push([Question, ans, RightAnswered, NonRightAnswered]);
-
-            //alert(Question.innerHTML);
-        });
-        return content;
+        function done() {
+            c.width = im.width;
+            c.height = im.height;
+            context.drawImage(im, 0, 0);
+            console.log(c.toDataURL());
+            return c.toDataURL();
+        }
     }
 
     function download(filename, text) {
@@ -309,43 +111,29 @@ localStorage.getItem('testgb');
         document.body.removeChild(element);
     }
 
-    /**
-     * @param {string} s1 Исходная строка
-     * @param {string} s2 Сравниваемая строка
-     * @param {object} [costs] Веса операций { [replace], [replaceCase], [insert], [remove] }
-     * @return {number} Расстояние Левенштейна
-     */
     function levenshtein(s1, s2, costs) {
         var i, j, l1, l2, flip, ch, chl, ii, ii2, cost, cutHalf;
         l1 = s1.length;
         l2 = s2.length;
-
         costs = costs || {};
         var cr = costs.replace || 1;
         var cri = costs.replaceCase || costs.replace || 1;
         var ci = costs.insert || 1;
         var cd = costs.remove || 1;
-
         cutHalf = flip = Math.max(l1, l2);
-
         var minCost = Math.min(cd, ci, cr);
         var minD = Math.max(minCost, (l1 - l2) * cd);
         var minI = Math.max(minCost, (l2 - l1) * ci);
         var buf = new Array((cutHalf * 2) - 1);
-
         for (i = 0; i <= l2; ++i) {
             buf[i] = i * minD;
         }
-
         for (i = 0; i < l1; ++i, flip = cutHalf - flip) {
             ch = s1[i];
             chl = ch.toLowerCase();
-
             buf[flip] = (i + 1) * minI;
-
             ii = flip;
             ii2 = cutHalf - flip;
-
             for (j = 0; j < l2; ++j, ++ii, ++ii2) {
                 cost = (ch === s2[j] ? 0 : (chl === s2[j].toLowerCase()) ? cri : cr);
                 buf[ii + 1] = Math.min(buf[ii2 + 1] + cd, buf[ii] + ci, buf[ii2] + cost);
@@ -354,205 +142,335 @@ localStorage.getItem('testgb');
         return buf[l2 + cutHalf - flip];
     }
 
-    //var max=2;
-    var w;
-    var content;
-    var Questions;
-    if (typeof unsafeWindow != undefined) {
-        w = unsafeWindow
-    } else {
-        w = window;
-    }
-    if (w.self != w.top) {
-        return;
-    }
-
-    /* // in future
-    var newDiv = document.createElement("div");
-    newDiv.style="display:none;position:absolute;left:0;top:0;z-index: 99999;";
-    newDiv.id="hfileinp";
-    newDiv.innerHTML = "<input type=\"file\" id=\"hackerfile\">"
-        +"<button onclick=\"readFile(document.getElementById('file'))\">"
-        +"Read!</button><div id=\"out\"></div>";
-    document.body.appendChild(newDiv);
-*/
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //             IN FINISH TEST
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    if (/http:\/\/nip\.tsatu\.edu\.ua\/mod\/quiz\/summary.php/.test(w.location.href)) {
-
-        //Press keys in end of test
-
-        document.addEventListener('keydown', function(event) {
-
-            if (event.code == 'KeyS') {
-                document.querySelector("[value=\"Відправити все та завершити\"]").click();
-            }
-
-            if (event.code == 'KeyD') {
-                document.querySelector(".moodle-dialogue input").click();
-            }
-
-        });
-
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //             END IN FINISH TEST
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //             IN TEST
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    else {
-        if (/http:\/\/nip\.tsatu\.edu\.ua/.test(w.location.href)) {
-            document.addEventListener('keydown', function(event) {
-
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Replace & delete images
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (event.code == 'KeyQ') {
-                    content = new Array();
-                    Questions = document.querySelectorAll('.que .content');
-
-                    Questions.forEach((part) => {
-
-                        //service icon filter
-                        var simg = part.querySelectorAll('.questioncorrectnessicon');
-                        simg.forEach((im) => {
-                            im.remove();
-                        });
-
-                        //img filter
-                        var img = part.querySelectorAll('img');
-                        img.forEach((im) => {
-                            //document.querySelectorAll('.que .content')[0].querySelectorAll('img')[0].attributes['src']
-                            var imgSr = im.attributes.src.value.replace(imgReg, '');
-
-                            im.outerHTML = '[[' + imgSr + ']]';
-                        });
-                    });
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Show / hide upload form
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                /*
-                if (event.code == 'KeyU') {
-                    if(document.querySelector('#hfileinp').style.display=="none") {
-                        document.querySelector('#hfileinp').style.display="block";
-                    } else {
-                        document.querySelector('#hfileinp').style.display="none";
-                    }
-                }*/
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Highlight the correct
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (event.code == 'KeyW') {
-                    highlightRightAnswers();
-                    //<div class="grade">Балів 1,00 з 1,00</div>
-                    //<div class="grade">Балів 0,00 з 1,00</div>
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Press random answer & Next
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (event.code == 'KeyR') {
-                    var selected = document.querySelectorAll("[type=radio]");
-                    var selectedb = document.querySelectorAll("[type=checkbox]");
-                    var rp;
-                    var rpw;
-                    if (selectedb.length > 0) {
-                        rp = Math.floor(Math.random() * Math.floor(selectedb.length));
-                        selectedb[rp].click();
-                        rpw = rp;
-                        while (rpw == rp) {
-                            rpw = Math.floor(Math.random() * Math.floor(selectedb.length));
-                        }
-                        selectedb[rpw].click();
-                        document.querySelectorAll(".mod_quiz-next-nav")[0].click();
-                    } else {
-                        if (selected.length > 0) {
-                            rp = Math.floor(Math.random() * Math.floor(selected.length));
-                            selected[rp].click();
-                            document.querySelectorAll(".mod_quiz-next-nav")[0].click();
-                        } else {
-                            alert("Error: can't determine type of question");
-                        }
-                    }
-                }
-
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Press "Next" / "Prev" key
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (event.code == 'KeyE') {
-                    document.querySelector(".mod_quiz-next-nav").click();
-                }
-                if (event.code == 'KeyA') {
-                    document.querySelector(".mod_quiz-prev-nav").click();
-                }
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Save results to file
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (event.code == 'KeyF') {
-                    content = parseFinish();
-                    content = filterAnswers(content);
-                    download("test.txt", JSON.stringify(content));
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Save results to LocalStorage
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                /*
-                if (event.code == 'KeyI') {
-                    content=parseFinish();
-                    content=filterAnswers(content);
-                    localStorage.setItem('testgb', JSON.stringify(content));
-                }
-*/
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Merge results to LocalStorage
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (event.code == 'KeyT') {
-                    content = parseFinish();
-                    var content2 = JSON.parse(localStorage.getItem('testgb'));
-                    var result = mergeAnswers(content, content2);
-                    result = filterAnswers(result);
-                    console.log(JSON.stringify(result));
-                    localStorage.setItem('testgb', JSON.stringify(result));
-                }
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Login
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (event.code == 'KeyL') {
-                    if (/http:\/\/nip\.tsatu\.edu\.ua\/login\/index\.php/.test(w.location.href)) {
-                        document.addEventListener('keydown', function(event) {
-                            document.getElementById("username").value = userlogin;
-                            document.getElementById("password").value = userpass;
-                            document.getElementById("loginbtn").click();
-                        });
-                    }
-                }
-
+    function svcIconRemove(part) {
+        var img = part.querySelectorAll('.questioncorrectnessicon');
+        if (img.length > 0) {
+            img.forEach((im) => {
+                im.remove();
             });
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // END IN TEST
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function filterImgs(part) {
+        var img = part.querySelectorAll('img');
+        if (img.length > 0) {
+            console.log(img);
+            img.forEach((im) => {
+                im.outerHTML = '[[' + getImg(createView(), im) + ']]';
+            });
+        }
+        return part;
+    }
 
-})(window);
+    function takeAnswers(part) {
+        return part.querySelectorAll('.formulation .r0, .formulation .r1');
+    }
+
+    function loadDB() {
+        return JSON.parse(localStorage.getItem('testgb'));
+    }
+
+    function filterRightanswer(text) {
+        var res = filterImgs(text).innerHTML;
+        res = res.replace(new RegExp('Правильна відповідь: '), '').replace(new RegExp('Ваша відповідь (не )?правильна'), '');
+        res = res.replace(new RegExp('Правильні відповіді: '), '');
+        res = res.replace(new RegExp('The correct answer is: '), '');
+        return res.replace(new RegExp('The correct answers are: '), '');
+    }
+
+    function detectMultiAnswer(answer) {
+        if (answer.search(new RegExp('The correct answers are: ')) || answer.search(new RegExp('Правильні відповіді: '))) {
+            return true;
+        }
+        return false;
+    }
+    /*          _ _           _
+               | | |         | |
+       ___ ___ | | | ___  ___| |_
+      / __/ _ \| | |/ _ \/ __| __|
+     | (_| (_) | | |  __/ (__| |_
+      \___\___/|_|_|\___|\___|\__|
+    */
+    function parseFinish() {
+        var content = [];
+        Questions = document.querySelectorAll('.que');
+        Questions.forEach((part) => {
+            svcIconRemove(part);
+            filterImgs(part);
+            var ans = new Array();
+            //Patch v1.2.2
+            //.replace(/<[^>]+>/g,'')
+            var Question = part.querySelector('.formulation .qtext').innerHTML.replace(/<[^>]+>/g, '');
+            var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
+            var RightAnswered = new Array();
+            var NonRightAnswered = new Array();
+            Answers.forEach((element) => {
+                var answ = filterAnswer(filterImgs(element).querySelector('label').innerHTML);
+                //incorrect
+                if (element.classList.contains('incorrect')) {
+                    NonRightAnswered.push(answ);
+                }
+                //correct
+                if (element.classList.contains('correct')) {
+                    RightAnswered.push(answ);
+                }
+                //check grade
+                if (element.querySelector('input[checked="checked"]')) {
+                    if ((part.querySelector('.grade').innerHTML.localeCompare('Балів 1,00 з 1,00')) == 0) {
+                        RightAnswered.push(answ);
+                    }
+                    if ((part.querySelector('.grade').innerHTML.localeCompare('Балів 0,00 з 1,00')) == 0) {
+                        NonRightAnswered.push(answ);
+                    }
+                }
+                ans.push(answ);
+            });
+            var RightAnswer = part.querySelector('.rightanswer');
+            if (RightAnswer == null) {
+                //bad luck
+            } else {
+                RightAnswered.push(filterRightanswer(RightAnswer));
+            }
+            content.push([Question, ans, RightAnswered, NonRightAnswered]);
+        });
+        return content;
+    }
+    ///////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////
+    /*_     _       _     _ _       _     _
+     | |   (_)     | |   | (_)     | |   | |
+     | |__  _  __ _| |__ | |_  __ _| |__ | |_
+     | '_ \| |/ _` | '_ \| | |/ _` | '_ \| __|
+     | | | | | (_| | | | | | | (_| | | | | |_
+     |_| |_|_|\__, |_| |_|_|_|\__, |_| |_|\__|
+               __/ |           __/ |
+              |___/           |___/
+    */
+    function highlightRightAnswers() {
+        var parts = document.querySelectorAll('.que');
+        var localAnswers = getDB();
+        parts.forEach((part) => {
+            svcIconRemove(part);
+            filterImgs(part);
+            //Selectors
+            //var rBlock=part.querySelector('');
+            var Quest = part.querySelector('.formulation .qtext')
+            var Question = filterQue(Quest.innerHTML);
+            var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
+            var answinpttext = part.querySelector('input[type="text"]');
+            /*                        _
+                                     | |
+              ___  ___  __ _ _ __ ___| |__
+             / __|/ _ \/ _` | '__/ __| '_ \
+             \__ \  __/ (_| | | | (__| | | |
+             |___/\___|\__,_|_|  \___|_| |_|
+            */
+            var queSelected = false;
+            var answSelected = Array();
+            for (var i = 0; i < localAnswers.length; i++) {
+                if ((Question.localeCompare(xQue(localAnswers[i]))) == 0) {
+                    Quest.style = "background:#00ff0c";
+                    queSelected = true;
+                    answSelected = localAnswers[i];
+                    console.log("Answer:");
+                    console.log(xpAnsw(answSelected));
+                    if (answinpttext != null) {
+                        answinpttext.value = xpAnsw(answSelected)[0];
+                    }
+                    break;
+                } else {
+                    //No answer found
+                    Quest.style = "background:#0000ff";
+                }
+            }
+            if (queSelected) {
+                Answers.forEach((element) => {
+                    var answch = element.querySelector('input');
+                    var answo = element.querySelector('label');
+                    console.log('----------');
+                    var answ = filterAnswer(filterImgs(answo).innerHTML);
+                    console.log(answ);
+                    var i;
+                    for (i = 0; i < xpAnsw(answSelected).length; i++) {
+                        console.log(xpAnsw(answSelected)[i]);
+                        if ((answ.localeCompare(xpAnsw(answSelected)[i])) == 0) {
+                            if (answinpttext == null) {
+                                answch.click();
+                            }
+                            //correct answer
+                            console.log('Find+++');
+                            answo.style = "background:#00ff0c";
+                        } else {
+                            var chance = checkChance(xpAnsw(answSelected)[i], answ);
+                            var newDiv = document.createElement("span");
+                            newDiv.style = "background: #ccc";
+                            newDiv.class = 'questioncorrectnessicon';
+                            newDiv.innerHTML = '[' + Math.round(chance) + ']';
+                            element.insertBefore(newDiv, answo);
+                        }
+                    }
+                    for (i = 0; i < xnAnsw(answSelected).length; i++) {
+                        console.log(xnAnsw(answSelected)[i]);
+                        if ((answ.localeCompare(xnAnsw(answSelected)[i])) == 0) {
+                            //wrong answer
+                            console.log('Find---');
+                            answo.style = "background:#ff7a7a";
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function checkChance(rightanswer, answer) {
+        return 100 - (levenshtein(answer, rightanswer) * 100 / rightanswer.length);
+    }
+
+    function xQue(id) {
+        return id[0];
+    }
+
+    function xAnsw(id) {
+        return id[1];
+    }
+
+    function xpAnsw(id) { //correct answers
+        return id[2];
+    }
+
+    function xnAnsw(id) { //wrong answers
+        return id[3];
+    }
+
+    function getDB() {
+        return JSON.parse(localStorage.getItem('testgb'));
+    }
+    /* font - big http://patorjk.com/software/taag/
+      _____ _______       _____ _______
+     / ____|__   __|/\   |  __ \__   __|
+    | (___    | |  /  \  | |__) | | |
+     \___ \   | | / L\ \ |  _  /  | |
+     ____) |  | |/ ____ \| | \ \  | |
+    |_____/   |_/_/    \_\_|  \_\ |_|
+    */
+    var newDiv = document.createElement("div");
+    newDiv.style = "display:none;position:absolute;left:0;top:0;z-index: 99999;";
+    newDiv.id = "hfileinp";
+    newDiv.innerHTML = `<input type=\"file\" id=\"hackerfile\" onchange=\"var file = this.files[0];var reader = new FileReader();
+reader.readAsText(file);reader.onload = function() {alert(reader.result);localStorage.setItem('testgb',reader.result); };reader.onerror = function() {console.log(reader.error);};\">
+<div id=\"out\"></div>`;
+    document.body.appendChild(newDiv);
+    ///////////////////////////////////////////////////////////////////
+    //    ROUTER
+    ///////////////////////////////////////////////////////////////////
+    if (/http:\/\/nip\.tsatu\.edu\.ua\/mod\/quiz\/summary.php/.test(w.location.href)) {
+        //Press keys in end of test
+        document.addEventListener('keydown', function(event) {
+            if (event.code == 'KeyS') {
+                document.querySelector("[value=\"Відправити все та завершити\"]").click();
+            }
+            if (event.code == 'KeyD') {
+                document.querySelector(".moodle-dialogue input").click();
+            }
+        });
+    } else if (/http:\/\/nip\.tsatu\.edu\.ua\/login\/index\.php/.test(w.location.href)) {
+        document.addEventListener('keydown', function(event) {
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Login
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyL') {
+                document.getElementById("username").value = userlogin;
+                document.getElementById("password").value = userpass;
+                document.getElementById("loginbtn").click();
+            }
+        });
+    } else if (/http:\/\/nip\.tsatu\.edu\.ua/.test(w.location.href)) {
+        document.addEventListener('keydown', function(event) {
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Replace & delete images (deprecated)
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyQ') {}
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Show / hide upload form
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyU') {
+                if (document.querySelector('#hfileinp').style.display == "none") {
+                    document.querySelector('#hfileinp').style.display = "block";
+                } else {
+                    document.querySelector('#hfileinp').style.display = "none";
+                }
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Highlight the correct
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyW') {
+                highlightRightAnswers();
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Press random answer & Next
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyR') {
+                var selected = document.querySelectorAll("[type=radio]");
+                var selectedb = document.querySelectorAll("[type=checkbox]");
+                var rp;
+                var rpw;
+                if (selectedb.length > 0) {
+                    rp = Math.floor(Math.random() * Math.floor(selectedb.length));
+                    selectedb[rp].click();
+                    rpw = rp;
+                    while (rpw == rp) {
+                        rpw = Math.floor(Math.random() * Math.floor(selectedb.length));
+                    }
+                    selectedb[rpw].click();
+                    document.querySelectorAll(".mod_quiz-next-nav")[0].click();
+                } else {
+                    if (selected.length > 0) {
+                        rp = Math.floor(Math.random() * Math.floor(selected.length));
+                        selected[rp].click();
+                        document.querySelectorAll(".mod_quiz-next-nav")[0].click();
+                    } else {
+                        alert("Error: can't determine type of question");
+                    }
+                }
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Press "Next" key
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyE') {
+                document.querySelector(".mod_quiz-next-nav").click();
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Press "Prev" key
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyA') {
+                document.querySelector(".mod_quiz-prev-nav").click();
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Save results to file
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyF') {
+                download("test.txt", localStorage.getItem('testgb'));
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Save results to LocalStorage
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /*
+                if (event.code == 'KeyI') {
+                    localStorage.setItem('testgb', JSON.stringify(filterAnswers(parseFinish())));
+                }
+*/
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Merge results to LocalStorage
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (event.code == 'KeyT') {
+                var result = filterBlocks(mergeBlocks(parseFinish(), JSON.parse(localStorage.getItem('testgb'))));
+                console.log(JSON.stringify(result));
+                localStorage.setItem('testgb', JSON.stringify(result));
+            }
+            if (event.code == 'KeyN') {
+                var ddsty = document.querySelector('#nav-notification-popover-container img');
+                alert(getImg(createView(), ddsty));
+            }
+        });
+    }
+})();
