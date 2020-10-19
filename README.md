@@ -15,7 +15,7 @@ op.js для освітнього порталу
  - G - Показати / сховати форму завантаження файлу з відповідями
  - L - автозаповнення логіна і пароля ( в /login/ ) // встановлюється на початку файлу
  
---Commands
+## Commands
   - Q - "Previous" key
   - W - highlight correct / incorrect answers (+show the percentage of matches with the answers in the database)
   - E - Next key
