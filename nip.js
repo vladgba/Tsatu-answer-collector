@@ -345,6 +345,15 @@
     function getDB() {
         return JSON.parse(localStorage.getItem('testgb'));
     }
+
+    function pressNext(){
+        document.querySelector(".mod_quiz-next-nav").click();
+    }
+
+    function pressPrev(){
+        document.querySelector(".mod_quiz-prev-nav").click();
+    }
+
     /* font - big http://patorjk.com/software/taag/
       _____ _______       _____ _______
      / ____|__   __|/\   |  __ \__   __|
@@ -423,7 +432,7 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
                     if (selected.length > 0) {
                         rp = Math.floor(Math.random() * Math.floor(selected.length));
                         selected[rp].click();
-                        document.querySelectorAll(".mod_quiz-next-nav")[0].click();
+                        pressNext();
                     } else {
                         alert("Error: can't determine type of question");
                     }
@@ -433,13 +442,13 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
             // Press "Next" key
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (event.code == 'KeyE') {
-                document.querySelector(".mod_quiz-next-nav").click();
+                pressNext();
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Press "Prev" key
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (event.code == 'KeyQ') {
-                document.querySelector(".mod_quiz-prev-nav").click();
+                pressPrev();
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Save results to file
