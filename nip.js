@@ -346,14 +346,13 @@
         return JSON.parse(localStorage.getItem('testgb'));
     }
 
-    function pressNext(){
+    function pressNext() {
         document.querySelector(".mod_quiz-next-nav").click();
     }
 
-    function pressPrev(){
+    function pressPrev() {
         document.querySelector(".mod_quiz-prev-nav").click();
     }
-
     /* font - big http://patorjk.com/software/taag/
       _____ _______       _____ _______
      / ____|__   __|/\   |  __ \__   __|
@@ -375,8 +374,27 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
     if (/http:\/\/nip\.tsatu\.edu\.ua\/mod\/quiz\/summary.php/.test(w.location.href)) {
         //Press keys in end of test
         document.addEventListener('keydown', function(event) {
+            if (event.code == 'KeyA') {
+                var tmpa = document.querySelectorAll(".submitbtns.mdl-align");
+                console.log(tmpa);
+                tmpa.forEach((el) => {
+                    console.log("----");
+                    if (el.querySelector("input[name=finishattempt]") === null) {
+                        el.querySelector("input[type=submit]").click();
+                    } else console.log("fff");
+                });
+                //document.querySelector("[value=\"Відправити все та завершити\"]").click();
+            }
             if (event.code == 'KeyS') {
-                document.querySelector("[value=\"Відправити все та завершити\"]").click();
+                var tmp = document.querySelectorAll(".submitbtns.mdl-align");
+                console.log(tmp);
+                tmp.forEach((el) => {
+                    console.log("----");
+                    if (el.querySelector("input[name=finishattempt]") !== null) {
+                        el.querySelector("input[type=submit]").click();
+                    } else console.log("fff");
+                });
+                //document.querySelector("[value=\"Відправити все та завершити\"]").click();
             }
             if (event.code == 'KeyD') {
                 document.querySelector(".moodle-dialogue input").click();
