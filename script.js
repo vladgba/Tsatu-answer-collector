@@ -230,10 +230,17 @@
                 }
                 //check grade
                 if (el.querySelector('input[checked="checked"]')) {
-                    if ((part.querySelector('.grade').innerHTML.localeCompare('Балів 1,00 з 1,00')) == 0) {
+                    var grade = part.querySelector('.grade').innerHTML;
+                    if ((grade.localeCompare('Балів 1,00 з 1,00')) == 0) {
                         RightAnswered.push(answ);
                     }
-                    if ((part.querySelector('.grade').innerHTML.localeCompare('Балів 0,00 з 1,00')) == 0) {
+                    if ((grade.localeCompare('Балів 0,00 з 1,00')) == 0) {
+                        NonRightAnswered.push(answ);
+                    }
+                    if ((grade.localeCompare('Mark 1.00 out of 1.00')) == 0) {
+                        RightAnswered.push(answ);
+                    }
+                    if ((grade.localeCompare('Mark 0.00 out of 1.00')) == 0) {
                         NonRightAnswered.push(answ);
                     }
                 }
