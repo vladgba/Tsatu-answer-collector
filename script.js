@@ -188,7 +188,8 @@
         res = res.replace(new RegExp('Правильна відповідь: '), '').replace(new RegExp('Ваша відповідь (не )?правильна'), '');
         res = res.replace(new RegExp('Правильні відповіді: '), '');
         res = res.replace(new RegExp('The correct answer is: '), '');
-        return res.replace(new RegExp('The correct answers are: '), '');
+        res = res.replace(new RegExp('The correct answers are: '), '');
+        return res.replace(/^([a-z])\. /, '').trim().replace(/\.$/, '');
     }
 
     function detectMultiAnswer(answer) {
