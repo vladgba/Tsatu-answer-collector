@@ -11,6 +11,8 @@
     'use strict';
     var userlogin = '',
         userpass = '';
+    var autoview = true,
+        autopressnext = true;
     var w;
     var Questions;
     if (typeof unsafeWindow != undefined) {
@@ -309,6 +311,7 @@
                 }
             }
             if (queSelected) {
+                var clicked = false;
                 Answers.forEach((el) => {
                     var answch = el.querySelector('input');
                     var answo = el.querySelector('label');
@@ -326,6 +329,7 @@
                             //correct answer
                             console.log('Find+++');
                             answo.style = "background:#00ff0c";
+                            clicked = true;
                         } else {
                             var chance = checkChance(xpAnsw(answSelected)[i], answ);
                             var newDiv = document.createElement("span");
@@ -344,6 +348,9 @@
                         }
                     }
                 });
+                if(clicked && autopressnext){
+                    pressNext();
+                }
             }
         });
     }
@@ -380,6 +387,68 @@
         document.querySelector(".mod_quiz-prev-nav").click();
     }
 
+    function clkBackEnd(){
+        var tmpa=document.querySelectorAll(".submitbtns.mdl-align");
+        console.log(tmpa);
+        tmpa.forEach((el) => {
+            console.log("----");
+            if(el.querySelector("input[name=finishattempt]")===null) {
+                if(/http:\/\/nip/.test(w.location.href)){
+                    el.querySelector("input[type=submit]").click();
+                } else {
+                    el.querySelector("button").click();
+                }
+            }
+            else console.log("fff");
+        });
+    }
+
+    function clkEnd(){
+        var tmp=document.querySelectorAll(".submitbtns.mdl-align");
+        console.log(tmp);
+        tmp.forEach((el) => {
+            console.log("----");
+            if(el.querySelector("input[name=finishattempt]")!==null) {
+                if(/http:\/\/nip/.test(w.location.href)){
+                    el.querySelector("input[type=submit]").click();
+                } else {
+                    el.querySelector("button").click();
+                }
+            }
+            else console.log("fff");
+
+
+        });
+    }
+    function clkOvEnd(){
+        document.querySelector(".moodle-dialogue input").click();
+    }
+
+    function clkRand(){
+        var selected = document.querySelectorAll(".que [type=radio]");
+        console.log(selected);
+        var selectedb = document.querySelectorAll(".que [type=checkbox]");
+        var rp;
+        var rpw;
+        if (selectedb.length > 0) {
+            rp = Math.floor(Math.random() * Math.floor(selectedb.length));
+            selectedb[rp].click();
+            rpw = rp;
+            while (rpw == rp) {
+                rpw = Math.floor(Math.random() * Math.floor(selectedb.length));
+            }
+            selectedb[rpw].click();
+            pressNext();
+        } else {
+            if (selected.length > 0) {
+                rp = Math.floor(Math.random() * Math.floor(selected.length));
+                selected[rp].click();
+                pressNext();
+            } else {
+                alert("Error: can't determine type of question");
+            }
+        }
+    }
     /* font - big http://patorjk.com/software/taag/
       _____ _______       _____ _______
      / ____|__   __|/\   |  __ \__   __|
@@ -414,44 +483,20 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
     }
     else
         if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/summary.php/.test(w.location.href)) {
+            if(autopressnext){
+                clkEnd();
+                clkOvEnd();
+            }
             //Press keys in end of test
             document.addEventListener('keydown', function(event) {
                 if (event.code == 'KeyA') {
-                    var tmpa=document.querySelectorAll(".submitbtns.mdl-align");
-                    console.log(tmpa);
-                    tmpa.forEach((el) => {
-                        console.log("----");
-                        if(el.querySelector("input[name=finishattempt]")===null) {
-                            if(/http:\/\/nip/.test(w.location.href)){
-                                el.querySelector("input[type=submit]").click();
-                            } else {
-                                el.querySelector("button").click();
-                            }
-                        }
-                        else console.log("fff");
-                    });
-                    //document.querySelector("[value=\"Відправити все та завершити\"]").click();
+                    clkBackEnd();
                 }
                 if (event.code == 'KeyS') {
-                    var tmp=document.querySelectorAll(".submitbtns.mdl-align");
-                    console.log(tmp);
-                    tmp.forEach((el) => {
-                        console.log("----");
-                        if(el.querySelector("input[name=finishattempt]")!==null) {
-                            if(/http:\/\/nip/.test(w.location.href)){
-                                el.querySelector("input[type=submit]").click();
-                            } else {
-                                el.querySelector("button").click();
-                            }
-                        }
-                        else console.log("fff");
-
-
-                    });
-                    //document.querySelector("[value=\"Відправити все та завершити\"]").click();
+                    clkEnd();
                 }
                 if (event.code == 'KeyD') {
-                    document.querySelector(".moodle-dialogue input").click();
+
                 }
             });
         } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/login\/index\.php/.test(w.location.href)) {
@@ -466,6 +511,7 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
                 }
             });
         } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua/.test(w.location.href)) {
+            if(autoview) highlightRightAnswers();
             document.addEventListener('keydown', function(event) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Show / hide upload form
@@ -487,29 +533,7 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
                 // Press random answer & Next
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (event.code == 'KeyR') {
-                    var selected = document.querySelectorAll(".que [type=radio]");
-                    console.log(selected);
-                    var selectedb = document.querySelectorAll(".que [type=checkbox]");
-                    var rp;
-                    var rpw;
-                    if (selectedb.length > 0) {
-                        rp = Math.floor(Math.random() * Math.floor(selectedb.length));
-                        selectedb[rp].click();
-                        rpw = rp;
-                        while (rpw == rp) {
-                            rpw = Math.floor(Math.random() * Math.floor(selectedb.length));
-                        }
-                        selectedb[rpw].click();
-                        pressNext();
-                    } else {
-                        if (selected.length > 0) {
-                            rp = Math.floor(Math.random() * Math.floor(selected.length));
-                            selected[rp].click();
-                            pressNext();
-                        } else {
-                            alert("Error: can't determine type of question");
-                        }
-                    }
+                    clkRand();
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Press "Next" key
