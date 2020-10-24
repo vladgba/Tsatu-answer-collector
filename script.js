@@ -11,8 +11,8 @@
     'use strict';
     var userlogin = '',
         userpass = '';
-    var autoview = true,
-        autopressnext = true;
+    var autoview = true,//true
+        autopressnext = true;//false
     var w;
     var Questions;
     if (typeof unsafeWindow != undefined) {
@@ -270,15 +270,19 @@
                __/ |           __/ |
               |___/           |___/
     */
-    function highlightRightAnswers() {
+    function highlightRightAnswers(pressnx) {
         var parts = document.querySelectorAll('.que');
         var localAnswers = getDB();
         parts.forEach((part) => {
             svcIconRemove(part);
             filterImgs(part);
             //Selectors
-            var Quest = part.querySelector('.formulation .qtext')
+            var Quest = part.querySelector('.formulation .qtext');
+            console.log('Question check:');
             var Question = filterQue(Quest);
+            console.log(Question);
+            console.log('@@@@@@@@');
+
             var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
             var answinpttext = part.querySelector('input[type="text"]');
             /*                        _
@@ -292,13 +296,12 @@
             var answSelected = Array();
             if(localAnswers.length>0) {
                 for (var i = 0; i < localAnswers.length; i++) {
-                    console.log(xQue(localAnswers[i]));
-                    console.log(Question);
                     if ((Question.localeCompare(xQue(localAnswers[i]))) == 0) {
+                        console.log(xQue(localAnswers[i]));
                         Quest.style = "background:#00ff0c";
                         queSelected = true;
                         answSelected = localAnswers[i];
-                        console.log("Answer:");
+                        console.log("Answers:");
                         console.log(xpAnsw(answSelected));
                         if (answinpttext != null) {
                             answinpttext.value = xpAnsw(answSelected)[0];
@@ -310,8 +313,8 @@
                     }
                 }
             }
+            var clicked = false;
             if (queSelected) {
-                var clicked = false;
                 Answers.forEach((el) => {
                     var answch = el.querySelector('input');
                     var answo = el.querySelector('label');
@@ -328,6 +331,7 @@
                             }
                             //correct answer
                             console.log('Find+++');
+                            part.classList.add('answerednow');
                             answo.style = "background:#00ff0c";
                             clicked = true;
                         } else {
@@ -344,15 +348,18 @@
                         if ((answ.localeCompare(xnAnsw(answSelected)[i])) == 0) {
                             //wrong answer
                             console.log('Find---');
+                            answo.classList.add('badanswer');
                             answo.style = "background:#ff7a7a";
                         }
                     }
                 });
-                if(clicked && autopressnext){
-                    pressNext();
-                }
             }
         });
+
+        if(autopressnext && !pressnx){
+            clkRand();
+            pressNext();
+        }
     }
 
     function checkChance(rightanswer, answer) {
@@ -425,29 +432,34 @@
     }
 
     function clkRand(){
-        var selected = document.querySelectorAll(".que [type=radio]");
-        console.log(selected);
-        var selectedb = document.querySelectorAll(".que [type=checkbox]");
-        var rp;
-        var rpw;
-        if (selectedb.length > 0) {
-            rp = Math.floor(Math.random() * Math.floor(selectedb.length));
-            selectedb[rp].click();
-            rpw = rp;
-            while (rpw == rp) {
-                rpw = Math.floor(Math.random() * Math.floor(selectedb.length));
-            }
-            selectedb[rpw].click();
-            pressNext();
-        } else {
-            if (selected.length > 0) {
-                rp = Math.floor(Math.random() * Math.floor(selected.length));
-                selected[rp].click();
+        var parts = document.querySelectorAll('.que:not(.answerednow)');
+        parts.forEach((part) => {
+            var selected = part.querySelectorAll(".content [type=radio]:not(.badanswer)");
+            var selectedb = part.querySelectorAll(".content [type=checkbox]:not(.badanswer)");
+            var rp;
+            var rpw;
+            if (selectedb.length > 0) {
+                rp = Math.floor(Math.random() * selectedb.length);
+                selectedb[rp].click();
+                rpw = rp;
+                while (rpw == rp) {
+                    rpw = Math.floor(Math.random() * selectedb.length);
+                }
+                selectedb[rpw].click();
+                console.log('%%'+selectedb[rpw]);
                 pressNext();
             } else {
-                alert("Error: can't determine type of question");
+                if (selected.length > 0) {
+                    rp = Math.floor(Math.random() * selected.length);
+                    selected[rp].click();
+                console.log('%%$');
+                    console.log(selectedb);
+                    //pressNext();
+                } else {
+                    alert("Error: can't determine type of question");
+                }
             }
-        }
+        });
     }
     /* font - big http://patorjk.com/software/taag/
       _____ _______       _____ _______
@@ -496,7 +508,7 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
                     clkEnd();
                 }
                 if (event.code == 'KeyD') {
-
+                    clkOvEnd();
                 }
             });
         } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/login\/index\.php/.test(w.location.href)) {
@@ -511,7 +523,9 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
                 }
             });
         } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua/.test(w.location.href)) {
-            if(autoview) highlightRightAnswers();
+            if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/review.php/.test(w.location.href)) {
+
+            }else if(autoview) highlightRightAnswers(0);
             document.addEventListener('keydown', function(event) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Show / hide upload form
@@ -527,7 +541,7 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
                 // Highlight the correct
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (event.code == 'KeyW') {
-                    highlightRightAnswers();
+                    highlightRightAnswers(1);
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Press random answer & Next
