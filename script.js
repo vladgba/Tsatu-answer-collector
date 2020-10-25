@@ -37,42 +37,45 @@
     }
 
     function filterQue(que) {
-        var ids = que.querySelectorAll('[id]');
-        ids.forEach(function(v, i, array) {
-            if(v.hasAttribute('id')) {
-                v.removeAttribute('id');
-            }
-        });
-        return que.innerHTML.trim().replace(/\.$/, '');
+        filterInner(que);
+        return filterText(que.innerHTML);
     }
 
     function filterAnswer(el) {
+        filterInner(el);
         var anb = el.querySelector('span.answernumber');
-        if (anb) {
-            anb.remove();
-        }
-        var anames = el.querySelectorAll('a');
-        anames.forEach(function(v, i, array) {
-            if(v.hasAttribute('name')) {
-                v.removeAttribute('name');
-            }
-        });
-        var spans = el.querySelectorAll('span');
-        anames.forEach(function(v, i, array) {
-            if(v.hasAttribute('style')) {
-                v.removeAttribute('style');
-            }
-        });
-        anb=null;
+        if (anb) anb.remove();
         var a=el.querySelector('label').innerHTML;
-        return a.replace(/^([a-z])\. /, '').trim().replace(/\.$/, '');
+        return filterText(a.replace(/^([a-z])\. /, ''));
     }
 
+    function filterInner(el){
+
+        el.querySelectorAll('[id]').forEach(function(v, i, a) {
+            v.removeAttribute('id');
+        });
+
+        el.querySelectorAll('a[name]').forEach(function(v, i, a) {
+            v.removeAttribute('name');
+        });
+        el.querySelectorAll('p[class]').forEach(function(v, i, a) {
+            v.removeAttribute('class');
+        });
+        el.querySelectorAll('span[style],p[style]').forEach(function(v, i, a) {
+            v.removeAttribute('style');
+        });
+        el.querySelectorAll('[lang]').forEach(function(v, i, a) {
+            v.removeAttribute('lang');
+        });
+    }
+    function filterText(a){
+        return a.trim().replace(/\.$/, '');
+    }
     function filterBlocks(arr) {
-        arr.forEach(function(cval, i, array) {
-            cval[1] = unique(cval[1]);
-            cval[2] = unique(cval[2]);
-            cval[3] = unique(cval[3]);
+        arr.forEach(function(v, i, a) {
+            v[1] = unique(v[1]);
+            v[2] = unique(v[2]);
+            v[3] = unique(v[3]);
         });
         return arr;
     }
@@ -80,10 +83,9 @@
     function mergeBlocks(a, b) {
         var result = Array();
         var i, j;
-        var addThis = true;
         if (b == null) b = Array();
         for (i = 0; i < a.length; i++) {
-            addThis = true;
+            var addThis = true;
             for (j = 0; j < b.length; j++) {
                 if (addThis) {
                     if (b[j][0].includes(a[i][0])) {
@@ -94,9 +96,7 @@
                     }
                 }
             }
-            if (addThis) {
-                result.push(a[i]);
-            }
+            if (addThis) result.push(a[i]);
         }
         return result.concat(b);
     }
@@ -129,13 +129,13 @@
     }
 
     function download(filename, text) {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+        var e = document.createElement('a');
+        e.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        e.setAttribute('download', filename);
+        e.style.display = 'none';
+        document.body.appendChild(e);
+        e.click();
+        document.body.removeChild(e);
     }
 
     var MD5 = function(d) {
