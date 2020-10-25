@@ -508,7 +508,8 @@
         });
     }
     function clkOvEnd(){
-        document.querySelector(".moodle-dialogue input").click();
+        var q = document.querySelector(".moodle-dialogue input");
+        if(q!==null) q.click();
     }
 
     function clkRand(){
