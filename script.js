@@ -12,7 +12,7 @@
     var userlogin = '',
         userpass = '';
     var autoview = true,//true
-        autopressnext = true;//false
+        autopressnext = false;//false
     var w;
     var Questions;
     if (typeof unsafeWindow != undefined) {
