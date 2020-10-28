@@ -12,7 +12,7 @@
     var userlogin = '',
         userpass = '';
     var autoview = true,//true
-        autopressnext = false;//false
+        autopressnext = true;//false
     var w;
     var Questions;
     if (typeof unsafeWindow != undefined) {
@@ -266,6 +266,7 @@
     }
 
     function filterRightanswer(text) {
+        filterInner(text);
         var res = filterImgs(text).innerHTML;
         res = res.replace(new RegExp('Правильна відповідь: '), '').replace(new RegExp('Ваша відповідь (не )?правильна'), '');
         res = res.replace(new RegExp('Правильні відповіді: '), '');
