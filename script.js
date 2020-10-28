@@ -12,8 +12,13 @@
     var userlogin = '',
         userpass = '';
     var autoview = true,//true
-        autopressnext = false;//false
+        autopressnext = false,//false
+        mergeanswers = true;
     var w;
+    var q = localStorage.getItem('testgb');
+    if(q===null) localStorage.setItem('testgb','[]');
+    q = localStorage.getItem('testgb2');
+    if(q===null) localStorage.setItem('testgb2','[]');
     var Questions;
     if (typeof unsafeWindow != undefined) {
         w = unsafeWindow;
@@ -352,6 +357,11 @@
               |___/           |___/
     */
     function highlightRightAnswers(pressnx) {
+        if(mergeanswers){
+            var result = filterBlocks(mergeBlocks(JSON.parse(localStorage.getItem('testgb2')), JSON.parse(localStorage.getItem('testgb'))));
+        }else{
+            localStorage.setItem('testgb',localStorage.getItem('testgb2'));
+        }
         var parts = document.querySelectorAll('.que');
         var localAnswers = getDB();
         parts.forEach((part) => {
@@ -555,7 +565,7 @@
     newDiv.style = "display:none;position:absolute;left:0;top:0;z-index: 99999;";
     newDiv.id = "hfileinp";
     newDiv.innerHTML = `<input type=\"file\" id=\"hackerfile\" onchange=\"var file = this.files[0];var reader = new FileReader();
-reader.readAsText(file);reader.onload = function() {alert(reader.result);localStorage.setItem('testgb',reader.result); };reader.onerror = function() {console.log(reader.error);};\">
+reader.readAsText(file);reader.onload = function() {alert(reader.result);localStorage.setItem('testgb2',reader.result); };reader.onerror = function() {console.log(reader.error);};\">
 <div id=\"out\"></div>`;
     document.body.appendChild(newDiv);
     ///////////////////////////////////////////////////////////////////
