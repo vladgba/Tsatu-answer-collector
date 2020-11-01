@@ -46,7 +46,7 @@
         w.formatBlock = function(v) {
             var r = '';
             v.forEach((el) => {
-                r += el[0] + "\r\n\r\n" + el[2] + "\r\n----------\r\n";
+                r += el[0] + "\r\n\r\n" + w.unique(el[2]) + "\r\n----------\r\n";
             });
             return r;
         }
@@ -55,7 +55,7 @@
             return w.filterText(que.innerHTML);
         }
 
-        function filterAnswer(el) {
+        w.filterAnswer = function (el) {
             w.filterInner(el);
             var anb = el.querySelector('span.answernumber');
             if (anb) anb.remove();
@@ -568,25 +568,27 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
         newDiv = document.createElement("div");
         newDiv.style = "text-align: center; position: fixed; bottom: 0; left: 0; z-index: 99999;";
         newDiv.innerHTML = `<style>.skey{
-  background-color: #4CAF50; /* Green */
   border: 1px solid #000;
   color: white;
   padding: 5px;
+margin: 0;
+text-shadow: none !important;
+border-radius: 0 !important;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 20px;}.r{background: #f00 !important;}</style>
-<button class="skey" onclick="highlightRightAnswers(true);">VWA</button>
-<button class="skey" onclick="downloadds();">DLA</button>
-<button class="skey" onclick="showUpload();">sUp</button>
-<button class="skey" onclick="downFormat();">DLF</button>
-<button class="skey" onclick="scrapResults();">SRs</button>
+  font-size: 20px;}.r{background: #f00 !important;}.g{background: #4CAF50 !important;}</style>
+<button class="skey g" onclick="highlightRightAnswers(true);">VWA</button>
+<button class="skey g" onclick="downloadds();">DLA</button>
+<button class="skey g" onclick="showUpload();">sUp</button>
+<button class="skey g" onclick="downFormat();">DLF</button>
+<button class="skey g" onclick="scrapResults();">SRs</button>
 <br>
-<button class="skey" onclick="localStorage.setItem('autoview',1);">VW</button>
+<button class="skey g" onclick="localStorage.setItem('autoview',1);">VW</button>
 <button class="skey r" onclick="localStorage.setItem('autoview',0);">VW</button>
-<button class="skey" onclick="localStorage.setItem('autopressnext',1);">Nx</button>
+<button class="skey g" onclick="localStorage.setItem('autopressnext',1);">Nx</button>
 <button class="skey r" onclick="localStorage.setItem('autopressnext',0);">Nx</button>
-<button class="skey" onclick="localStorage.setItem('mergeanswers',1);">MA</button>
+<button class="skey g" onclick="localStorage.setItem('mergeanswers',1);">MA</button>
 <button class="skey r" onclick="localStorage.setItem('mergeanswers',0);">MA</button>`;
         //download("test.txt", localStorage.getItem('testgb'));
         document.body.appendChild(newDiv);
