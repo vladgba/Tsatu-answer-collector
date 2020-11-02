@@ -31,12 +31,14 @@
         if (localStorage.getItem('testgb2') == null) localStorage.setItem('testgb2', '[]');
         var Questions;
 
-        if (localStorage.getItem('testgb2') !== '[]' && w.mergeanswers) {
-            var result = w.filterBlocks(w.mergeBlocks(JSON.parse(localStorage.getItem('testgb2')), JSON.parse(localStorage.getItem('testgb'))));
-        } else {
-            localStorage.setItem('testgb', localStorage.getItem('testgb2'));
+        if (localStorage.getItem('testgb2') !== '[]'){
+            if(w.mergeanswers) {
+                var result = w.filterBlocks(w.mergeBlocks(JSON.parse(localStorage.getItem('testgb2')), JSON.parse(localStorage.getItem('testgb'))));
+            } else {
+                localStorage.setItem('testgb', localStorage.getItem('testgb2'));
+            }
+            localStorage.getItem('testgb2','[]');
         }
-        localStorage.getItem('testgb2','[]');
         /*
     Block - q [a ra ba]
     */
@@ -305,12 +307,12 @@
             localStorage.setItem('testgb', JSON.stringify(result));
         }
         /*          _ _           _
-               | | |         | |
-       ___ ___ | | | ___  ___| |_
-      / __/ _ \| | |/ _ \/ __| __|
-     | (_| (_) | | |  __/ (__| |_
-      \___\___/|_|_|\___|\___|\__|
-    */
+                   | | |         | |
+           ___ ___ | | | ___  ___| |_
+          / __/ _ \| | |/ _ \/ __| __|
+         | (_| (_) | | |  __/ (__| |_
+          \___\___/|_|_|\___|\___|\__|
+        */
         w.parseFinish = function() {
             var content = [];
             Questions = document.querySelectorAll('.que');
