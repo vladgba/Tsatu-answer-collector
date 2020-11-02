@@ -30,6 +30,13 @@
         if (localStorage.getItem('testgb') == null) localStorage.setItem('testgb', '[]');
         if (localStorage.getItem('testgb2') == null) localStorage.setItem('testgb2', '[]');
         var Questions;
+
+        if (localStorage.getItem('testgb2') !== '[]' && w.mergeanswers) {
+            var result = w.filterBlocks(w.mergeBlocks(JSON.parse(localStorage.getItem('testgb2')), JSON.parse(localStorage.getItem('testgb'))));
+        } else {
+            localStorage.setItem('testgb', localStorage.getItem('testgb2'));
+        }
+        localStorage.getItem('testgb2','[]');
         /*
     Block - q [a ra ba]
     */
@@ -368,11 +375,6 @@
               |___/           |___/
     */
         w.highlightRightAnswers = function(pressnx) {
-            if (localStorage.getItem('testgb2') !== '[]' && w.mergeanswers) {
-                var result = w.filterBlocks(w.mergeBlocks(JSON.parse(localStorage.getItem('testgb2')), JSON.parse(localStorage.getItem('testgb'))));
-            } else {
-                localStorage.setItem('testgb', localStorage.getItem('testgb2'));
-            }
             var parts = document.querySelectorAll('.que');
             var localAnswers = w.getDB();
             parts.forEach((part) => {
@@ -424,7 +426,7 @@
                         var answo = el.querySelector('label');
                         console.log('----------');
                         w.filterImgs(answo);
-                        var answ = filterAnswer(el);
+                        var answ = w.filterAnswer(el);
                         console.log(answ);
                         var i;
                         for (i = 0; i < w.xpAnsw(answSelected).length; i++) {
