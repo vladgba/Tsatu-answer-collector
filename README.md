@@ -1,9 +1,9 @@
 # Tsatu-answer-collector (Tampermonkey script)
-nip.js для навчально-інформаційного порталу
-op.js для освітнього порталу
+nip.js для навчально-інформаційного порталу (moodle v3.2 or 3.2.1)
+op.js для освітнього порталу (moodle v3.8.5)
 
 ## Installing
-1. Install the Chrome/Firefox plugin
+1. Install Tampermonkey plugin
 [Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/)
 [Google Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
 [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)
@@ -14,6 +14,31 @@ op.js для освітнього порталу
 3. Copy the contents of the file "script.js"
 4. Save (Ctrl - S)
 
+## Commands
+	Q - "Previous" key
+	W - highlight correct / incorrect answers (+show the percentage of matches with the answers in the database)
+	E - Next key
+	R - Click random answer
+	T - Add answers to db (LocalStorage)
+ 
+	A - Back to test
+	S - Click "Submit all and complete" (in /quiz/summary.php)
+	D - Click "Confirm test completion" (in /quiz/summary.php)
+	
+	F - Save the answers to a file
+	G - Show / hide the answer file download form
+
+	L - autocomplete login and password (in / login /) // is set at the beginning of the file
+	
+	
+  ## Settings
+  
+    var userlogin = '',  -  Login for quick login
+        userpass = '';  -  Password for quick login
+        
+    var autoview = true,//def: true  -  Automatically highlight and select answers (true - yes) (false - no)
+        autopressnext = true;//def: false  -  Auto press "next" (true - yes) (false - no)
+----------
 ## Установка
 1. Установите расширение "Tampermonkey"
 [Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/)
@@ -25,12 +50,12 @@ op.js для освітнього порталу
 2. Нажмите на иконку расширения и выберите "Создать новый скрипт..."
 3. Вставьте содержимое файла "script.js"
 4. Сохраните (Ctrl - S)
-----------
+
 ## Команды
 	Q - клавиша «Предыдущая»
 	W - выделить правильные / неправильные ответы (+ показать процент совпадения с ответами в базе)
 	E - клавиша «Далее»
-	R - случайная ответ и клавиша «Далее»
+	R - Выбрать случайный ответ
 	T - Добавить ответы в базу (LocalStorage)
 
 	A - Вернуться к тесту
@@ -43,39 +68,6 @@ op.js для освітнього порталу
 	L - автозаполнение логина и пароля (в / login /) // устанавливается в начале скрипта
 ------------
 
-## Команди
-	Q - клавіша «Попередня»
-	W - виділити правильні / неправильні відповіді (+ показати відсоток збігу з відповідями в базі)
-	E - клавіша «Далі»
-	R - Випадкова відповідь і клавіша «Далі»
-	T - Додати відповіді в базу (LocalStorage)
- 
-	A - Повернутися до тесту
-	S - Натиснути «Відправити все та завершити» ( в /quiz/summary.php )
-	D - Натиснути «Підтвердити закінчення тесту»  ( в /quiz/summary.php)
- 
-	F - Зберегти відповіді в файл
-	G - Показати / сховати форму завантаження файлу з відповідями
- 
-	L - автозаповнення логіна і пароля ( в /login/ ) // встановлюється на початку файлу
-------------
- 
-## Commands
-	Q - "Previous" key
-	W - highlight correct / incorrect answers (+show the percentage of matches with the answers in the database)
-	E - Next key
-	R - Random answer and "Next" key
-	T - Add answers to db (LocalStorage)
- 
-	A - Back to test
-	S - Click "Submit all and complete" (in /quiz/summary.php)
-	D - Click "Confirm test completion" (in /quiz/summary.php)
-	
-	F - Save the answers to a file
-	G - Show / hide the answer file download form
-
-	L - autocomplete login and password (in / login /) // is set at the beginning of the file
-  
   ## Настройка
   
     var userlogin = '',  -  Логин для быстрого входа
