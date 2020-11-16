@@ -1,15 +1,15 @@
 # Tsatu-answer-collector (Tampermonkey script)
-nip.js для навчально-інформаційного порталу (moodle v3.2 or 3.2.1)
-op.js для освітнього порталу (moodle v3.8.5)
+- для навчально-інформаційного порталу - nip.tsatu.edu.ua (moodle v3.2 or 3.2.1)
+- для освітнього порталу - op.tsatu.edu.ua (moodle v3.8.5)
 
 ## Installing
 1. Install Tampermonkey plugin
-[Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/)
-[Google Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-[Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)
-[Apple Safari](https://tampermonkey.net/?ext=dhdg&browser=safari).
-[Dolphin](https://tampermonkey.net/?ext=dhdg&browser=dolphin)
-[UC Browser](https://tampermonkey.net/?ext=dhdg&browser=ucweb)
+- [Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/)
+- [Google Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)
+- [Apple Safari](https://tampermonkey.net/?ext=dhdg&browser=safari).
+- [Dolphin](https://tampermonkey.net/?ext=dhdg&browser=dolphin)
+- [UC Browser](https://tampermonkey.net/?ext=dhdg&browser=ucweb)
 2. Click on the extension icon and select "New script ..."
 3. Copy the contents of the file "script.js"
 4. Save (Ctrl - S)
@@ -41,12 +41,12 @@ op.js для освітнього порталу (moodle v3.8.5)
 ----------
 ## Установка
 1. Установите расширение "Tampermonkey"
-[Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/)
-[Google Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-[Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)
-[Apple Safari](https://tampermonkey.net/?ext=dhdg&browser=safari).
-[Dolphin](https://tampermonkey.net/?ext=dhdg&browser=dolphin).
-[UC Browser](https://tampermonkey.net/?ext=dhdg&browser=ucweb)
+- [Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/tampermonkey/)
+- [Google Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)
+- [Apple Safari](https://tampermonkey.net/?ext=dhdg&browser=safari).
+- [Dolphin](https://tampermonkey.net/?ext=dhdg&browser=dolphin).
+- [UC Browser](https://tampermonkey.net/?ext=dhdg&browser=ucweb)
 2. Нажмите на иконку расширения и выберите "Создать новый скрипт..."
 3. Вставьте содержимое файла "script.js"
 4. Сохраните (Ctrl - S)
@@ -66,7 +66,6 @@ op.js для освітнього порталу (moodle v3.8.5)
 	G - Показать / скрыть форму загрузки файла с ответами
  
 	L - автозаполнение логина и пароля (в / login /) // устанавливается в начале скрипта
-------------
 
   ## Настройка
   
