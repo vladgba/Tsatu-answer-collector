@@ -605,7 +605,7 @@ border-radius: 0 !important;
         //    ROUTER
         ///////////////////////////////////////////////////////////////////
         if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(w.location.href) && w.autoscrap) {
-            var hg = document.querySelectorAll(".cell.c4");
+            var hg = document.querySelectorAll(".cell.lastcol");
             hg.forEach((el) => {
                 var ei = el.querySelector("a");
                 window.open(ei.href);
