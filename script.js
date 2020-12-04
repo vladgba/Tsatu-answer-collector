@@ -27,6 +27,9 @@
         w.autoview = (localStorage.getItem('autoview') == null) ? false : ((localStorage.getItem('autoview') > 0) ? true : false); //true
         w.autopressnext = (localStorage.getItem('autopressnext') == null) ? false : ((localStorage.getItem('autopressnext') > 0) ? true : false); //false
         w.mergeanswers = (localStorage.getItem('mergeanswers') == null) ? false : ((localStorage.getItem('mergeanswers') > 0) ? true : false);
+        w.autoscrap = (localStorage.getItem('autoscrap') == null) ? false : ((localStorage.getItem('autoscrap') > 0) ? true : false);
+        w.username = ((localStorage.getItem('username') == null) && (localStorage.getItem('username') > 0)) ? localStorage.getItem('username') : '';
+        w.userpass = ((localStorage.getItem('userpass') == null) && (localStorage.getItem('userpass') > 0)) ? localStorage.getItem('userpass') : '';
         if (localStorage.getItem('testgb') == null) localStorage.setItem('testgb', '[]');
         if (localStorage.getItem('testgb2') == null) localStorage.setItem('testgb2', '[]');
         var Questions;
@@ -367,7 +370,7 @@
         }
         ///////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////
-        /*_     _       _     _ _       _     _
+    /*_     _       _     _ _       _     _
      | |   (_)     | |   | (_)     | |   | |
      | |__  _  __ _| |__ | |_  __ _| |__ | |_
      | '_ \| |/ _` | '_ \| | |/ _` | '_ \| __|
@@ -390,7 +393,7 @@
                 console.log('@@@@@@@@');
                 var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
                 var answinpttext = part.querySelector('input[type="text"]');
-                /*                        _
+            /*                        _
                                      | |
               ___  ___  __ _ _ __ ___| |__
              / __|/ _ \/ _` | '__/ __| '_ \
@@ -593,13 +596,23 @@ border-radius: 0 !important;
 <button class="skey g" onclick="localStorage.setItem('autopressnext',1);">Nx</button>
 <button class="skey r" onclick="localStorage.setItem('autopressnext',0);">Nx</button>
 <button class="skey g" onclick="localStorage.setItem('mergeanswers',1);">MA</button>
-<button class="skey r" onclick="localStorage.setItem('mergeanswers',0);">MA</button>`;
+<button class="skey r" onclick="localStorage.setItem('mergeanswers',0);">MA</button>
+<button class="skey g" onclick="localStorage.setItem('autoscrap',1);">AS</button>
+<button class="skey r" onclick="localStorage.setItem('autoscrap',0);">AS</button>`;
         //download("test.txt", localStorage.getItem('testgb'));
         document.body.appendChild(newDiv);
         ///////////////////////////////////////////////////////////////////
         //    ROUTER
         ///////////////////////////////////////////////////////////////////
-        if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/course\/view\.php/.test(w.location.href)) {
+        if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(w.location.href) && w.autoscrap) {
+            var hg = document.querySelectorAll(".cell.c4");
+            hg.forEach((el) => {
+                var ei = el.querySelector("a");
+                window.open(ei.href);
+            });
+            
+        }
+        else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/course\/view\.php/.test(w.location.href)) {
             var hg = document.querySelectorAll("li.quiz");
             hg.forEach((el) => {
                 if (el.querySelectorAll(".isrestricted").length > 0) {
@@ -643,6 +656,7 @@ border-radius: 0 !important;
             } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua/.test(w.location.href)) {
                 if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/review.php/.test(w.location.href)) {
                     if (!/&showall=1$/.test(w.location.href)) w.location.href = w.location.href + '&showall=1';
+                    else if (w.autoscrap) w.scrapResults();
                 } else if (w.autoview && /http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/attempt.php/.test(w.location.href)) w.highlightRightAnswers(false);
                 document.addEventListener('keydown', function(event) {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
