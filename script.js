@@ -6,6 +6,8 @@
 // @version 1.1
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
+// @updateURL https://raw.githubusercontent.com/vladgba/Tsatu-answer-collector/master/script.js
+// @downloadURL https://raw.githubusercontent.com/vladgba/Tsatu-answer-collector/master/script.js
 // @include http://nip.tsatu.edu.ua/*
 // @include http://op.tsatu.edu.ua/*
 // ==/UserScript==
