@@ -26,7 +26,7 @@
         window.w = w;
         w.userlogin = '';
         w.userpass = '';
-        w.autoview = (localStorage.getItem('autoview') == null) ? false : ((localStorage.getItem('autoview') > 0) ? true : false); //true
+        w.autoview = (localStorage.getItem('autoview') == null) ? true : ((localStorage.getItem('autoview') > 0) ? true : false); //true
         w.autopressnext = (localStorage.getItem('autopressnext') == null) ? false : ((localStorage.getItem('autopressnext') > 0) ? true : false); //false
         w.mergeanswers = (localStorage.getItem('mergeanswers') == null) ? false : ((localStorage.getItem('mergeanswers') > 0) ? true : false);
         w.autoscrap = (localStorage.getItem('autoscrap') == null) ? false : ((localStorage.getItem('autoscrap') > 0) ? true : false);
@@ -581,32 +581,34 @@ reader.readAsText(file);reader.onload = function() {alert(reader.result);localSt
         document.body.appendChild(newDiv);
         newDiv = document.createElement("div");
         newDiv.style = "text-align: center; position: fixed; bottom: 0; left: 0; z-index: 99999;";
-        newDiv.innerHTML = `<style>.skey{
-  border: 1px solid #000;
-  color: white;
-  padding: 5px;
-margin: 0;
-text-shadow: none !important;
-border-radius: 0 !important;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 20px;}.r{background: #f00 !important;}.g{background: #4CAF50 !important;}</style>
-<button class="skey g" onclick="highlightRightAnswers(true);">VWA</button>
-<button class="skey g" onclick="downloadds();">DLA</button>
-<button class="skey g" onclick="showUpload();">sUp</button>
-<button class="skey g" onclick="downFormat();">DLF</button>
-<button class="skey g" onclick="scrapResults();">SRs</button>
-<button class="skey g" onclick="clearDB();">Fdb</button>
+        newDiv.innerHTML = `<style>.skey{border: 1px solid #000;color: white;margin: 1px;padding: 1px;text-shadow: none !important;
+border-radius: 0 !important;text-align: center;text-decoration: none;display: inline-block;font-size: 14px;}
+.r{background: #f00 !important;padding:0 3px}.g{background: #4CAF50 !important;padding:0 3px}.b{background: #2942e3 !important;}.o{background: #444 !important;}
+</style>
+
+<button class="skey b" onclick="highlightRightAnswers(true);">ПоказОтв</button>
+<button class="skey b" onclick="downloadds();">СкачФайлОтв</button>
+<button class="skey b" onclick="showUpload();">ЗагрузОтв</button>
+<button class="skey b" onclick="downFormat();">СкачЭтиОтв</button>
+<button class="skey b" onclick="scrapResults();">ДобавОтв</button>
+<button class="skey b" onclick="clearDB();">СтерОтв</button>
 <br>
-<button class="skey g" onclick="localStorage.setItem('autoview',1);">VW</button>
-<button class="skey r" onclick="localStorage.setItem('autoview',0);">VW</button>
-<button class="skey g" onclick="localStorage.setItem('autopressnext',1);">Nx</button>
-<button class="skey r" onclick="localStorage.setItem('autopressnext',0);">Nx</button>
-<button class="skey g" onclick="localStorage.setItem('mergeanswers',1);">MA</button>
-<button class="skey r" onclick="localStorage.setItem('mergeanswers',0);">MA</button>
-<button class="skey g" onclick="localStorage.setItem('autoscrap',1);">AS</button>
-<button class="skey r" onclick="localStorage.setItem('autoscrap',0);">AS</button>`;
+<span class="skey o">ПоказОтв
+<button class="skey g" onclick="localStorage.setItem('autoview',1);">+</button>
+<button class="skey r" onclick="localStorage.setItem('autoview',0);">-</button></span>
+
+<span class="skey o">АвтоДалее
+<button class="skey g" onclick="localStorage.setItem('autopressnext',1);">+</button>
+<button class="skey r" onclick="localStorage.setItem('autopressnext',0);">-</button></span>
+
+<span class="skey o">
+<button class="skey g" onclick="localStorage.setItem('mergeanswers',1);">Добав</button>
+<button class="skey r" onclick="localStorage.setItem('mergeanswers',0);">Замен</button>
+ИзФайла</span>
+
+<span class="skey o">АвтоДобавОтв
+<button class="skey g" onclick="localStorage.setItem('autoscrap',1);">+</button>
+<button class="skey r" onclick="localStorage.setItem('autoscrap',0);">-</button></span>`;
         //download("test.txt", localStorage.getItem('testgb'));
         document.body.appendChild(newDiv);
         ///////////////////////////////////////////////////////////////////
