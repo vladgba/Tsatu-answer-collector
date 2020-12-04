@@ -572,40 +572,11 @@
 reader.readAsText(file);reader.onload = function() {alert(reader.result);localStorage.setItem('testgb2',reader.result); };reader.onerror = function() {console.log(reader.error);};\">
 <div id=\"out\"></div>`;
         document.body.appendChild(newDiv);
-        newDiv = document.createElement("div");
-        newDiv.style = "text-align: center; position: fixed; bottom: 0; left: 0; z-index: 99999;";
-        newDiv.innerHTML = `<style>.skey{
-  border: 1px solid #000;
-  color: white;
-  padding: 5px;
-margin: 0;
-text-shadow: none !important;
-border-radius: 0 !important;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 20px;}.r{background: #f00 !important;}.g{background: #4CAF50 !important;}</style>
-<button class="skey g" onclick="highlightRightAnswers(true);">VWA</button>
-<button class="skey g" onclick="downloadds();">DLA</button>
-<button class="skey g" onclick="showUpload();">sUp</button>
-<button class="skey g" onclick="downFormat();">DLF</button>
-<button class="skey g" onclick="scrapResults();">SRs</button>
-<br>
-<button class="skey g" onclick="localStorage.setItem('autoview',1);">VW</button>
-<button class="skey r" onclick="localStorage.setItem('autoview',0);">VW</button>
-<button class="skey g" onclick="localStorage.setItem('autopressnext',1);">Nx</button>
-<button class="skey r" onclick="localStorage.setItem('autopressnext',0);">Nx</button>
-<button class="skey g" onclick="localStorage.setItem('mergeanswers',1);">MA</button>
-<button class="skey r" onclick="localStorage.setItem('mergeanswers',0);">MA</button>
-<button class="skey g" onclick="localStorage.setItem('autoscrap',1);">AS</button>
-<button class="skey r" onclick="localStorage.setItem('autoscrap',0);">AS</button>`;
-        //download("test.txt", localStorage.getItem('testgb'));
-        document.body.appendChild(newDiv);
         ///////////////////////////////////////////////////////////////////
         //    ROUTER
         ///////////////////////////////////////////////////////////////////
         if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(w.location.href) && w.autoscrap) {
-            var hg = document.querySelectorAll(".cell.c4");
+            var hg = document.querySelectorAll(".cell.lastcol");
             hg.forEach((el) => {
                 var ei = el.querySelector("a");
                 window.open(ei.href);
