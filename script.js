@@ -151,6 +151,10 @@
                 document.querySelector('#hfileinp').style.display = "none";
             }
         }
+        w.clearDB = function(){
+            localStorage.setItem('testgb', '[]');
+            localStorage.setItem('testgb2', '[]');
+        }
         w.download = function(filename, text) {
             var e = document.createElement('a');
             e.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -308,6 +312,7 @@
             var result = w.filterBlocks(w.mergeBlocks(w.parseFinish(), JSON.parse(localStorage.getItem('testgb'))));
             console.log(JSON.stringify(result));
             localStorage.setItem('testgb', JSON.stringify(result));
+            if(w.autoscrap) window.close();
         }
         /*          _ _           _
                    | | |         | |
@@ -590,6 +595,7 @@ border-radius: 0 !important;
 <button class="skey g" onclick="showUpload();">sUp</button>
 <button class="skey g" onclick="downFormat();">DLF</button>
 <button class="skey g" onclick="scrapResults();">SRs</button>
+<button class="skey g" onclick="clearDB();">Fdb</button>
 <br>
 <button class="skey g" onclick="localStorage.setItem('autoview',1);">VW</button>
 <button class="skey r" onclick="localStorage.setItem('autoview',0);">VW</button>
@@ -610,7 +616,7 @@ border-radius: 0 !important;
                 var ei = el.querySelector("a");
                 window.open(ei.href);
             });
-            
+            window.close();
         }
         else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/course\/view\.php/.test(w.location.href)) {
             var hg = document.querySelectorAll("li.quiz");
@@ -656,7 +662,7 @@ border-radius: 0 !important;
             } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua/.test(w.location.href)) {
                 if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/review.php/.test(w.location.href)) {
                     if (!/&showall=1$/.test(w.location.href)) w.location.href = w.location.href + '&showall=1';
-                    else if (w.autoscrap) w.scrapResults();
+                  else if (w.autoscrap) w.scrapResults();
                 } else if (w.autoview && /http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/attempt.php/.test(w.location.href)) w.highlightRightAnswers(false);
                 document.addEventListener('keydown', function(event) {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -688,6 +694,12 @@ border-radius: 0 !important;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     if (event.code == 'KeyQ') {
                         w.pressPrev();
+                    }
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // Clear database
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    if (event.code == 'KeyJ') {
+                        w.clearDB();
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Save results to file
