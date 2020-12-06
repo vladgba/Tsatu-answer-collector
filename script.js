@@ -3,7 +3,7 @@
 // @description Tsatu
 // @author vladgba
 // @license MIT
-// @version 1.1
+// @version 1.2
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @updateURL https://raw.githubusercontent.com/vladgba/Tsatu-answer-collector/master/script.js
@@ -623,8 +623,8 @@ border-radius: 0 !important;text-align: center;text-decoration: none;display: in
             window.close();
         }
         else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/course\/view\.php/.test(w.location.href)) {
-            var hg = document.querySelectorAll("li.quiz");
-            hg.forEach((el) => {
+            var hhg = document.querySelectorAll("li.quiz");
+            hhg.forEach((el) => {
                 if (el.querySelectorAll(".isrestricted").length > 0) {
                     el.style = "background:#FF0000;color:#fff";
                 } else {
