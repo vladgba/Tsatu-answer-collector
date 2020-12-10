@@ -3,7 +3,7 @@
 // @description Tsatu
 // @author vladgba
 // @license MIT
-// @version 1.2
+// @version 1.2.2
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @updateURL https://raw.githubusercontent.com/vladgba/Tsatu-answer-collector/master/script.js
@@ -42,7 +42,7 @@
             } else {
                 localStorage.setItem('testgb', localStorage.getItem('testgb2'));
             }
-            localStorage.getItem('testgb2','[]');
+            localStorage.setItem('testgb2','[]');
         }
         /*
     Block - q [a ra ba]
