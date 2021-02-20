@@ -3,7 +3,7 @@
 // @description Tsatu
 // @author vladgba
 // @license MIT
-// @version 1.2.2
+// @version 1.2.3
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @updateURL https://raw.githubusercontent.com/vladgba/Tsatu-answer-collector/master/script.js
@@ -325,20 +325,28 @@
         */
         w.parseFinish = function() {
             var content = [];
+                console.log('parseFinish');
             Questions = document.querySelectorAll('.que');
+                console.log('que all');
             Questions.forEach((part) => {
                 w.svcIconRemove(part);
                 w.filterImgs(part);
+                console.log('img filter');
                 var ans = new Array();
                 //Patch v1.2.2
                 //.replace(/<[^>]+>/g,'')
                 var Question = w.filterQue(part.querySelector('.formulation .qtext'));
+                console.log('que filter');
                 var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
+                console.log('answ filter');
                 var RightAnswered = new Array();
                 var NonRightAnswered = new Array();
                 Answers.forEach((el) => {
+                console.log('answer:');
                     w.filterImgs(el);
                     var answ = w.filterAnswer(el);
+
+                console.log(answ);
                     //incorrect
                     if (el.classList.contains('incorrect')) {
                         NonRightAnswered.push(answ);
@@ -371,8 +379,10 @@
                 } else {
                     RightAnswered.push(w.filterRightanswer(RightAnswer));
                 }
-                content.push([Question, ans, RightAnswered, NonRightAnswered]);
+                console.log([Question, ans, RightAnswered, NonRightAnswered]);
+                console.log(content.push([Question, ans, RightAnswered, NonRightAnswered]));
             });
+            console.log(content);
             return content;
         }
         ///////////////////////////////////////////////////////////
@@ -394,7 +404,7 @@
                 w.filterImgs(part);
                 //Selectors
                 var Quest = part.querySelector('.formulation .qtext');
-                console.log('Question check:');
+                console.log('Question check:----------------------------------------------------------------');
                 var Question = w.filterQue(Quest);
                 console.log(Question);
                 console.log('@@@@@@@@');
@@ -413,7 +423,10 @@
                 if (localAnswers.length > 0) {
                     console.log('@22@@@@@');
                     for (var i = 0; i < localAnswers.length; i++) {
-                        if ((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) {
+                        console.log('@@for@@');
+                        console.log(w.xQue(localAnswers[i]));
+
+                        if (((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) || ((w.xQue(localAnswers[i]).indexOf(Question)) != -1)) {
                             console.log('@@33@@@@');
                             console.log(w.xQue(localAnswers[i]));
                             Quest.style = "background:#00ff0c";
