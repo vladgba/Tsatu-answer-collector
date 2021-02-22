@@ -1,5 +1,5 @@
 # Tsatu-answer-collector (Tampermonkey script)
-- для навчально-інформаційного порталу - nip.tsatu.edu.ua (moodle v3.2 or 3.2.1)
+-- для навчально-інформаційного порталу - nip.tsatu.edu.ua (moodle v3.2 or 3.2.1) --
 - для освітнього порталу - op.tsatu.edu.ua (moodle v3.8.5)
 
 ## Installing
