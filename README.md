@@ -1,6 +1,6 @@
-# Tsatu-answer-collector (Tampermonkey script)
--- для навчально-інформаційного порталу - nip.tsatu.edu.ua (moodle v3.2 or 3.2.1) --
-- для освітнього порталу - op.tsatu.edu.ua (moodle v3.8.5)
+# Tsatu-answer-collector (Tampermonkey script) (for moodle v3.2 - 3.8.5)
+~~- для навчально-інформаційного порталу - nip.tsatu.edu.ua ~~
+- для освітнього порталу - op.tsatu.edu.ua 
 
 ## Installing
 1. Install Tampermonkey plugin
