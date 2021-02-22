@@ -45,7 +45,7 @@
             localStorage.setItem('testgb2','[]');
         }
         /*
-    Block - q [a ra ba]
+    Block - [ q [a] [ra] [ba] ]
     */
 
         w.unique = function(arr) {
@@ -94,7 +94,7 @@
             });
         }
         w.filterText = function(a) {
-            return a.trim().replace(/\.$/, '');
+            return a.trim().replace(/\.$/, '').replace(/\s\s+/g, ' ');
         }
         w.filterBlocks = function(arr) {
             arr.forEach(function(v, i, a) {
@@ -325,9 +325,9 @@
         */
         w.parseFinish = function() {
             var content = [];
-                console.log('parseFinish');
+            console.log('parseFinish');
             Questions = document.querySelectorAll('.que');
-                console.log('que all');
+            console.log('que all');
             Questions.forEach((part) => {
                 w.svcIconRemove(part);
                 w.filterImgs(part);
@@ -427,6 +427,7 @@
                         console.log(w.xQue(localAnswers[i]));
 
                         if (((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) || ((w.xQue(localAnswers[i]).indexOf(Question)) != -1)) {
+                        //if ((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) {
                             console.log('@@33@@@@');
                             console.log(w.xQue(localAnswers[i]));
                             Quest.style = "background:#00ff0c";
@@ -665,7 +666,7 @@ border-radius: 0 !important;text-align: center;text-decoration: none;display: in
                         w.clkOvEnd();
                     }
                 });
-            } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/login\/index\.php/.test(w.location.href)) {
+            } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/login\/index\.php/.test(w.location.href)) {/*
                 document.addEventListener('keydown', function(event) {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Login
@@ -675,7 +676,7 @@ border-radius: 0 !important;text-align: center;text-decoration: none;display: in
                         document.getElementById("password").value = w.userpass;
                         document.getElementById("loginbtn").click();
                     }
-                });
+                });*/
             } else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua/.test(w.location.href)) {
                 if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/review.php/.test(w.location.href)) {
                     if (!/&showall=1$/.test(w.location.href)) w.location.href = w.location.href + '&showall=1';
