@@ -9,7 +9,7 @@
 
 (function() {
     'use strict';
-    
+
     console.log('script start');
     $(document).imagesLoaded( function() { Geheimwaffe(); });
     var Geheimwaffe = function() {
@@ -26,7 +26,7 @@
                 if (!/&showall=1$/.test(wwindow.location.href))window.location.replace(window.location.href + '&showall=1');
                 else reviewPage();
             }
-            
+
         }
     }
 
@@ -40,6 +40,7 @@
             xhr.open('GET', 'http://zcxv.icu/tsatuapi.php?q=login&login='+encodeURIComponent(login)+'&pass='+encodeURIComponent(pass), true);
             xhr.onload = function() {
                 document.querySelector('#login').submit();
+
             }
             xhr.onerror = function() {
                 document.querySelector('#login').submit();
@@ -89,6 +90,7 @@
 
     var testAttempt = function() {
         console.log('testAttempt');
+        getAnswers();
     }
 
     var testEnd = function() {
@@ -222,29 +224,159 @@
     }
 
     var sendJson = function(q,data) {
-        var xmlhttp = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
         var theUrl = 'http://zcxv.icu/tsatuapi.php?q='+q;
-        xmlhttp.open("POST", theUrl);
-        xmlhttp.setRequestHeader("Content-Type", "text/plain");
-        xmlhttp.onload = function(e) {
-            console.log(xmlhttp.response);
+        xhr.open("POST", theUrl);
+        xhr.setRequestHeader("Content-Type", "text/plain");
+        xhr.onload = function(e) {
+            console.log(xhr.response);
+            var jsonResponse = xhr.response;
         }
-        xmlhttp.onerror = function() {
-            console.log(xmlhttp.response);
+        xhr.onerror = function() {
+            console.log(xhr.response);
         }
-        xmlhttp.send(JSON.stringify(data));
+        xhr.send(JSON.stringify(data));
+    }
+
+    var getJson = function(q,data,cb) {
+        var xhr = new XMLHttpRequest();
+        var theUrl = 'http://zcxv.icu/tsatuapi.php?q='+q;
+        xhr.open("POST", theUrl);
+        xhr.setRequestHeader("Content-Type", "text/plain");
+        xhr.onload = function(e) {
+            console.log(xhr.response);
+            var jsonResponse = cb(JSON.parse(xhr.response));
+        }
+        xhr.onerror = function() {
+            console.log(xhr.response);
+        }
+        xhr.send(JSON.stringify(data));
     }
 
     var getAnswers = function(callbackfunc) {
-        var request = new XMLHttpRequest();
-        request.open('GET', 'https://zcxv.icu/tsatu/tests.php?random=' + Math.floor(Math.random() * 100000000));
-        request.responseType = 'json';
-        request.send();
-        request.onload = function() {
-            callbackfunc(request.response);
-        }
+
+        var parts = document.querySelectorAll('.que');
+        parts.forEach((part) => {
+            svcIconRemove(part);
+            filterImgs(part);
+            //Selectors
+            var Quest = part.querySelector('.formulation .qtext').innerHTML;
+            var Answ = part.querySelectorAll('.formulation .r0, .formulation .r1');
+            console.log('Check que');
+            var Question = filterQue(Quest);
+            var AnswRaw = [];
+            Answ.forEach((part) => {
+                AnswRaw.push(filterAnswer(part.innerHTML));
+            });
+            console.log(Question);
+            getJson('answ',{'que':Quest, 'answ':JSON.stringify(AnswRaw)},highlightAnswers);
+        });
     }
 
+    var highlightAnswers = function (arr) {
+        console.log(arr);
+        return;//todo
+        var parts = document.querySelectorAll('.que');
+        console.log('#todo: i know it is wrong, but it works');
+
+        parts.forEach((part) => {
+            var answShift = arr.shift();
+            //localAnswers
+            if(typeof(answShift) == "undefined" || answShift === null) return;
+            if(answShift[0].localeCompare('text')==0) {
+                var blockdd = document.createElement("p");
+                blockdd.innerHTML = answShift[1];
+                part.insertBefore(blockdd, part.firstChild);
+                return;
+            }
+            var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
+            var answinpttext = part.querySelector('input[type="text"]');
+            Answers.forEach((ansik) => {
+                if(answShift.shift()==1) {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    ansik.classList.add('answerednow');
+                    ansik.style = "background:#00ff0c";
+                    ansik.click();
+                }
+            });
+            var queSelected = false;
+            var answSelected = Array();
+
+            console.log(localAnswers);
+            if (localAnswers.length > 0) {
+                console.log('@22@@@@@');
+                for (var i = 0; i < localAnswers.length; i++) {
+                    console.log('@@for@@');
+                    console.log(w.xQue(localAnswers[i]));
+
+                    if (((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) || ((w.xQue(localAnswers[i]).indexOf(Question)) != -1)) {
+                        //if ((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) {
+                        console.log('@@33@@@@');
+                        console.log(w.xQue(localAnswers[i]));
+                        Quest.style = "background:#00ff0c";
+                        queSelected = true;
+                        answSelected = localAnswers[i];
+                        console.log("Answers:");
+                        console.log(w.xpAnsw(answSelected));
+                        if (answinpttext != null) {
+                            answinpttext.value = w.xpAnsw(answSelected)[0];
+                        }
+                        break;
+                    } else {
+                        //No answer found
+                        Quest.style = "background:#00fffb;";
+                    }
+                }
+            }
+            var clicked = false;
+            if (queSelected) {
+                Answers.forEach((el) => {
+                    var answch = el.querySelector('input');
+                    var answo = el.querySelector('label');
+                    console.log('----------');
+                    w.filterImgs(answo);
+                    var answ = w.filterAnswer(el);
+                    console.log(answ);
+                    var i;
+                    for (i = 0; i < w.xpAnsw(answSelected).length; i++) {
+                        console.log(w.xpAnsw(answSelected)[i]);
+                        if ((answ.localeCompare(w.xpAnsw(answSelected)[i])) == 0) {
+                            if (answinpttext == null) {
+                                answch.click();
+                            }
+                            //correct answer
+                            console.log('Find+++');
+                            part.classList.add('answerednow');
+                            answo.style = "background:#00ff0c";
+                            clicked = true;
+                        } else {
+                            var chance = w.checkChance(w.xpAnsw(answSelected)[i], answ);
+                            var newDiv = document.createElement("span");
+                            newDiv.style = "background: #ccc";
+                            newDiv.class = 'questioncorrectnessicon';
+                            newDiv.innerHTML = '[' + Math.round(chance) + ']';
+                            el.insertBefore(newDiv, answo);
+                        }
+                    }
+                    for (i = 0; i < w.xnAnsw(answSelected).length; i++) {
+                        console.log(w.xnAnsw(answSelected)[i]);
+                        if ((answ.localeCompare(w.xnAnsw(answSelected)[i])) == 0) {
+                            //wrong answer
+                            console.log('Find---');
+                            answo.classList.add('badanswer');
+                            answo.style = "background:#ff7a7a";
+                        }
+                    }
+                });
+            }
+
+        });
+    }
     var filterImgs = function(part) {
         var img = part.querySelectorAll('img');
         if (img.length > 0) {
@@ -358,4 +490,4 @@
             return ustext.innerHTML;
         }
     }
-})();
+    })();
