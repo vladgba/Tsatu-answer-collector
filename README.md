@@ -1,4 +1,5 @@
 # Tsatu-answer-collector (Tampermonkey script) (for moodle v3.2 - 3.8.5)
+ Скрипт помощи с ответами на портале ТГАТУ (ТДАТУ)
 - для освітнього порталу - op.tsatu.edu.ua 
 
 ## Installing
