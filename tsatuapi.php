@@ -70,16 +70,16 @@ switch ($_GET['q']) {
 		for($i=0;$i<count($json);$i++){
 			try {
 				$quer = $dbh->prepare('SELECT * from `que` WHERE `name` = ?');
-				$quer->execute(array($json[$i][0]));
+				$quer->execute(array(filterQue($json[$i][0])));
 				$res = $quer->fetchAll();
 				if(count($res)<1) {
 					$dbh->beginTransaction();
 					$quer = $dbh->prepare('INSERT INTO `que` (`name`) VALUES (?)');
-					$quer->execute(array($json[$i][0]));
+					$quer->execute(array(filterQue($json[$i][0])));
 					$dbh->commit();
 					//$queid = $dbh->lastInsertId();//trouble
 					$quer = $dbh->prepare('SELECT * from `que` WHERE `name` = ?');
-					$quer->execute(array($json[$i][0]));
+					$quer->execute(array(filterQue($json[$i][0])));
 					$res = $quer->fetchAll();
 					$queid = $res[0]['id'];
 				} else {
@@ -89,15 +89,15 @@ switch ($_GET['q']) {
 				//answers
 				for($j=0;$j<count($json[$i][1]);$j++){
 					$quer = $dbh->prepare('INSERT INTO `answ` (`name`, `qid`) SELECT ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `answ` WHERE `name`=? AND `qid`=? LIMIT 1) ');
-					$quer->execute(array($json[$i][1][$j], $queid, $json[$i][1][$j], $queid));
+					$quer->execute(array(filterAnswer($json[$i][1][$j]), $queid, filterAnswer($json[$i][1][$j]), $queid));
 				}
 				for($j=0;$j<count($json[$i][2]);$j++){
 					$quer = $dbh->prepare('UPDATE `answ` SET `right` = 1 WHERE `name`=? AND `qid`=?');
-					$quer->execute(array($json[$i][2][$j], $queid));
+					$quer->execute(array(filterAnswer($json[$i][2][$j]), $queid));
 				}
 				for($j=0;$j<count($json[$i][3]);$j++){
 					$quer = $dbh->prepare('UPDATE `answ` SET `right` = 2 WHERE `name`=? AND `qid`=?');
-					$quer->execute(array($json[$i][3][$j], $queid));
+					$quer->execute(array(filterAnswer($json[$i][3][$j]), $queid));
 				}
 				
 				$quer = null;
@@ -119,13 +119,13 @@ switch ($_GET['q']) {
 		try {
 			foreach ($json as $k => $jsoni){
 				$quer = $dbh->prepare('SELECT * from `que` WHERE `name` = ?');
-				$quer->execute(array($jsoni['que']));
+				$quer->execute(array(filterQue($jsoni['que'])));
 				$res = $quer->fetchAll();
 				$queid = 0;
 				$ansr=[];
 				if(count($res)>0) {
 					$queid = $res[0]['id'];
-					$jsonan = json_decode($jsoni['answ'],true);
+					$jsonan = json_decode(filterAnswer($jsoni['answ']),true);
 					//answers
 					for($j=0;$j<count($jsonan);$j++){
 						$quer = $dbh->prepare('SELECT * FROM `answ` WHERE `name`=? AND `qid`=?');
@@ -167,6 +167,13 @@ switch ($_GET['q']) {
 		break;
 }
 
+function filterQue($q){
+	return preg_replace('/ src="(.+?)"/', '', $q);
+}
+
+function filterAnswer($q){
+	return preg_replace('/ src="(.+?)"/', '', $q);
+}
 
 function mergeBlocks ($a, $b) {
     $result = [];
