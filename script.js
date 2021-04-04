@@ -465,7 +465,7 @@
         tmp.forEach((el) => {
             console.log("----");
             if (el.querySelector("input[name=finishattempt]") !== null) {
-                if (/http:\/\/nip/.test(w.location.href)) {
+                if (/https?:\/\/nip/.test(window.location.href)) {//TODO: combine this for either version
                     el.querySelector("input[type=submit]").click();
                 } else {
                     el.querySelector("button").click();
