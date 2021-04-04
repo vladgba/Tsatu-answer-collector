@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name TsatuCheat
-// @version 1.0.0
+// @version 1.0.2
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @include http://nip.tsatu.edu.ua/*
@@ -9,7 +9,6 @@
 
 (function() {
     'use strict';
-
     console.log('script start');
     $(document).imagesLoaded( function() { Geheimwaffe(); });
     var Geheimwaffe = function() {
@@ -23,7 +22,7 @@
             else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/attempt\.php/.test(window.location.href)) {testAttempt();}/*attempt*/
             else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(window.location.href)) {testEnd();}/*testEnd*/
             else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/review\.php/.test(window.location.href)) {
-                if (!/&showall=1$/.test(wwindow.location.href))window.location.replace(window.location.href + '&showall=1');
+                if (!/&showall=1$/.test(window.location.href))window.location.replace(window.location.href + '&showall=1');
                 else reviewPage();
             }
 
@@ -37,7 +36,7 @@
             var xhr = new XMLHttpRequest();
             var login = document.querySelector('#username').value;
             var pass = document.querySelector('#password').value;
-            xhr.open('GET', 'http://zcxv.icu/tsatuapi.php?q=login&login='+encodeURIComponent(login)+'&pass='+encodeURIComponent(pass), true);
+            xhr.open('GET', 'http://tsatu.zcxv.icu/api.php?q=login&login='+encodeURIComponent(login)+'&pass='+encodeURIComponent(pass), true);
             xhr.onload = function() {
                 document.querySelector('#login').submit();
 
@@ -70,26 +69,67 @@
     }
 
     var testList = function() {
+        var hhg = document.querySelectorAll("li.quiz");
+        hhg.forEach((el) => {
+            if (el.querySelectorAll(".isrestricted").length > 0) {
+                el.style = "background:#FF0000;color:#fff";
+            } else {
+                el.style = "background:#00FF00;color:#fff";
+            }
+            //http://op.tsatu.edu.ua/mod/quiz/view.php?id=
+            //if (/http:\/\/op\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(el.href))
+            //el.style="background:#FF0000;color:#fff";
+        });
         var tlist = document.querySelectorAll('li.quiz');
         var rid = window.location.href;//\/\/\/--------------------------------------------------------
         var arr = [];
         arr.push({'name':rid,'link':'0','':userid()});
         tlist.forEach((el) => {
             var tarr = {'name':'','link':''};
+            var rgu = el.querySelector("span.accesshide");
+            if (rgu != null) rgu.outerHTML='';
             var par = el.querySelector("a");
+            if(par == null) return;
             tarr.name=el.innerText.trim();
             tarr.link=par.getAttribute('href').trim();
             arr.push(tarr);
         });
+        console.log(arr);
         sendJson('course',arr);
     }
 
     var testView = function() {
         console.log('testView');
     }
-
+    var lister;
+    var attemptNext = function() {
+        console.log('testAttemptNext');
+        var butn = document.querySelector('.mod_quiz-next-nav');
+        butn.setAttribute('type','submit');
+        butn.click();
+    }
     var testAttempt = function() {
         console.log('testAttempt');
+        var butn = document.querySelector('.mod_quiz-next-nav');
+        butn.setAttribute('type','button');
+
+        lister = document.querySelector('.mod_quiz-next-nav').addEventListener('click', (event) => {
+            document.querySelector('.mod_quiz-next-nav').removeEventListener('click', lister, false);
+            //event.preventDefault();
+            var checki = document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked');
+            if(checki.length<1) {
+                attemptNext();
+                return;
+            }
+            var cheans = [];
+            var ques = document.querySelector('.qtext').innerHTML;
+            checki.forEach((el) => {
+                cheans.push(el.parentNode.querySelector('label').innerHTML);
+            });
+            sendJson('attempt',{'que':ques,'ans':cheans},attemptNext);
+            //document.querySelector('.mod_quiz-next-nav').click();
+        });
+
         getAnswers();
     }
 
@@ -159,9 +199,26 @@
             console.log(content.push([Question, ans, RightAnswered, NonRightAnswered]));
         });
         console.log(content);
-        sendJson('answers',content);
+        sendJson('answers',filterBlocks(content));
+    }
+    var filterBlocks = function(arr) {
+        arr.forEach(function(v, i, a) {
+            v[1] = unique(v[1]);
+            v[2] = unique(v[2]);
+            v[3] = unique(v[3]);
+        });
+        return arr;
     }
 
+    var unique = function(arr) {
+        let result = [];
+        for (let str of arr) {
+            if (!result.includes(str)) {
+                result.push(str);
+            }
+        }
+        return result;
+    }
     var svcIconRemove = function(part) {
         var img = part.querySelectorAll('.questioncorrectnessicon, i .icon');
         if (img.length > 0) {
@@ -177,21 +234,31 @@
     }
 
     var filterInner = function(el) {
-        el.querySelectorAll('[id]').forEach(function(v, i, a) {
-            v.removeAttribute('id');
-        });
-        el.querySelectorAll('a[name]').forEach(function(v, i, a) {
-            v.removeAttribute('name');
-        });
-        el.querySelectorAll('p[class]').forEach(function(v, i, a) {
-            v.removeAttribute('class');
-        });
-        el.querySelectorAll('span[style],p[style]').forEach(function(v, i, a) {
-            v.removeAttribute('style');
-        });
-        el.querySelectorAll('[lang]').forEach(function(v, i, a) {
-            v.removeAttribute('lang');
-        });
+        if(el.querySelectorAll('[id]').length > 0){
+            el.querySelectorAll('[id]').forEach(function(v, i, a) {
+                v.removeAttribute('id');
+            });
+        }
+        if(el.querySelectorAll('a[name]').length > 0){
+            el.querySelectorAll('a[name]').forEach(function(v, i, a) {
+                v.removeAttribute('name');
+            });
+        }
+        if(el.querySelectorAll('p[class]').length > 0){
+            el.querySelectorAll('p[class]').forEach(function(v, i, a) {
+                v.removeAttribute('class');
+            });
+        }
+        if(el.querySelectorAll('span[style],p[style]').length > 0){
+            el.querySelectorAll('span[style],p[style]').forEach(function(v, i, a) {
+                v.removeAttribute('style');
+            });
+        }
+        if(el.querySelectorAll('[lang]').length > 0){
+            el.querySelectorAll('[lang]').forEach(function(v, i, a) {
+                v.removeAttribute('lang');
+            });
+        }
     }
 
     var filterText = function(a) {
@@ -223,24 +290,27 @@
         return false;
     }
 
-    var sendJson = function(q,data) {
+    var sendJson = function(q,data,cb=null) {
+        console.log(data);
         var xhr = new XMLHttpRequest();
-        var theUrl = 'http://zcxv.icu/tsatuapi.php?q='+q;
-        xhr.open("POST", theUrl);
+        var theUrl = 'http://tsatu.zcxv.icu/api.php?q='+q;
+        xhr.open("POST", theUrl, true);
         xhr.setRequestHeader("Content-Type", "text/plain");
         xhr.onload = function(e) {
             console.log(xhr.response);
             var jsonResponse = xhr.response;
+            if(cb!=null) cb();
         }
         xhr.onerror = function() {
             console.log(xhr.response);
+            alert('Error: Not sent');
         }
         xhr.send(JSON.stringify(data));
     }
 
     var getJson = function(q,data,cb) {
         var xhr = new XMLHttpRequest();
-        var theUrl = 'http://zcxv.icu/tsatuapi.php?q='+q;
+        var theUrl = 'http://tsatu.zcxv.icu/api.php?q='+q;
         xhr.open("POST", theUrl);
         xhr.setRequestHeader("Content-Type", "text/plain");
         xhr.onload = function(e) {
@@ -249,6 +319,7 @@
         }
         xhr.onerror = function() {
             console.log(xhr.response);
+            alert('Error (get): Not sent');
         }
         xhr.send(JSON.stringify(data));
     }
@@ -256,124 +327,66 @@
     var getAnswers = function(callbackfunc) {
 
         var parts = document.querySelectorAll('.que');
+        var qparr = [];
         parts.forEach((part) => {
             svcIconRemove(part);
             filterImgs(part);
             //Selectors
-            var Quest = part.querySelector('.formulation .qtext').innerHTML;
+            var Quest = part.querySelector('.formulation .qtext');
             var Answ = part.querySelectorAll('.formulation .r0, .formulation .r1');
             console.log('Check que');
             var Question = filterQue(Quest);
             var AnswRaw = [];
             Answ.forEach((part) => {
-                AnswRaw.push(filterAnswer(part.innerHTML));
+                AnswRaw.push(filterAnswer(part));
             });
             console.log(Question);
-            getJson('answ',{'que':Quest, 'answ':JSON.stringify(AnswRaw)},highlightAnswers);
+            qparr.push({'que':Question, 'answ':JSON.stringify(AnswRaw)});
         });
+        getJson('answ',qparr,highlightAnswers);
     }
 
     var highlightAnswers = function (arr) {
         console.log(arr);
-        return;//todo
+        //return;//todo
         var parts = document.querySelectorAll('.que');
         console.log('#todo: i know it is wrong, but it works');
 
         parts.forEach((part) => {
+            if(arr.length<1) return;
             var answShift = arr.shift();
+            console.log(answShift);
+
+            if(answShift.length<1) return;
             //localAnswers
             if(typeof(answShift) == "undefined" || answShift === null) return;
-            if(answShift[0].localeCompare('text')==0) {
+            if(false && answShift[0].localeCompare('text')==0) {
                 var blockdd = document.createElement("p");
                 blockdd.innerHTML = answShift[1];
                 part.insertBefore(blockdd, part.firstChild);
                 return;
             }
             var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
-            var answinpttext = part.querySelector('input[type="text"]');
+            //var answinpttext = part.querySelector('input[type="text"]');
             Answers.forEach((ansik) => {
-                if(answShift.shift()==1) {
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    ansik.classList.add('answerednow');
-                    ansik.style = "background:#00ff0c";
-                    ansik.click();
+                var righte = answShift.shift();
+                switch(righte) {
+                    case '1':
+                        ansik.classList.add('answerednow');
+                        ansik.style = "background:#00ff0c";
+                        ansik.querySelector('input').click();
+                        break;
+
+                    case '2':
+                        ansik.classList.add('badanswer');
+                        ansik.style = "background:#ff7a7a";
+                        break;
+
+                    default:
+                        ansik.style = "background:#fff";
+                        break;
                 }
             });
-            var queSelected = false;
-            var answSelected = Array();
-
-            console.log(localAnswers);
-            if (localAnswers.length > 0) {
-                console.log('@22@@@@@');
-                for (var i = 0; i < localAnswers.length; i++) {
-                    console.log('@@for@@');
-                    console.log(w.xQue(localAnswers[i]));
-
-                    if (((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) || ((w.xQue(localAnswers[i]).indexOf(Question)) != -1)) {
-                        //if ((Question.localeCompare(w.xQue(localAnswers[i]))) == 0) {
-                        console.log('@@33@@@@');
-                        console.log(w.xQue(localAnswers[i]));
-                        Quest.style = "background:#00ff0c";
-                        queSelected = true;
-                        answSelected = localAnswers[i];
-                        console.log("Answers:");
-                        console.log(w.xpAnsw(answSelected));
-                        if (answinpttext != null) {
-                            answinpttext.value = w.xpAnsw(answSelected)[0];
-                        }
-                        break;
-                    } else {
-                        //No answer found
-                        Quest.style = "background:#00fffb;";
-                    }
-                }
-            }
-            var clicked = false;
-            if (queSelected) {
-                Answers.forEach((el) => {
-                    var answch = el.querySelector('input');
-                    var answo = el.querySelector('label');
-                    console.log('----------');
-                    w.filterImgs(answo);
-                    var answ = w.filterAnswer(el);
-                    console.log(answ);
-                    var i;
-                    for (i = 0; i < w.xpAnsw(answSelected).length; i++) {
-                        console.log(w.xpAnsw(answSelected)[i]);
-                        if ((answ.localeCompare(w.xpAnsw(answSelected)[i])) == 0) {
-                            if (answinpttext == null) {
-                                answch.click();
-                            }
-                            //correct answer
-                            console.log('Find+++');
-                            part.classList.add('answerednow');
-                            answo.style = "background:#00ff0c";
-                            clicked = true;
-                        } else {
-                            var chance = w.checkChance(w.xpAnsw(answSelected)[i], answ);
-                            var newDiv = document.createElement("span");
-                            newDiv.style = "background: #ccc";
-                            newDiv.class = 'questioncorrectnessicon';
-                            newDiv.innerHTML = '[' + Math.round(chance) + ']';
-                            el.insertBefore(newDiv, answo);
-                        }
-                    }
-                    for (i = 0; i < w.xnAnsw(answSelected).length; i++) {
-                        console.log(w.xnAnsw(answSelected)[i]);
-                        if ((answ.localeCompare(w.xnAnsw(answSelected)[i])) == 0) {
-                            //wrong answer
-                            console.log('Find---');
-                            answo.classList.add('badanswer');
-                            answo.style = "background:#ff7a7a";
-                        }
-                    }
-                });
-            }
 
         });
     }
@@ -382,10 +395,18 @@
         if (img.length > 0) {
             console.log(img);
             img.forEach((im) => {
-                im.setAttribute('hash',MD5(getImg(window.createView(), im)));
+                im.setAttribute('hash',MD5(getImg(createView(), im)));
             });
         }
         return part;
+    }
+
+    var createView = function() {
+        var canvas = document.createElement("canvas");
+        canvas.id = 'canv';
+        canvas.style = "border:black solid;display:none;";
+        document.body.appendChild(canvas);
+        return canvas;
     }
 
     var getImg = function(c, im) {
