@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name TsatuCheat
-// @version 1.0.2
+// @version 1.0.3
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @include http://nip.tsatu.edu.ua/*
@@ -9,6 +9,7 @@
 
 (function() {
     'use strict';
+    var haymaking=false;//enable automatic collection of responses from the account
     console.log('script start');
     $(document).imagesLoaded( function() { Geheimwaffe(); });
     var Geheimwaffe = function() {
@@ -324,8 +325,7 @@
         xhr.send(JSON.stringify(data));
     }
 
-    var getAnswers = function(callbackfunc) {
-
+    var getAnswers = function() {
         var parts = document.querySelectorAll('.que');
         var qparr = [];
         parts.forEach((part) => {
@@ -348,7 +348,6 @@
 
     var highlightAnswers = function (arr) {
         console.log(arr);
-        //return;//todo
         var parts = document.querySelectorAll('.que');
         console.log('#todo: i know it is wrong, but it works');
 
@@ -368,7 +367,12 @@
             }
             var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
             //var answinpttext = part.querySelector('input[type="text"]');
+
             Answers.forEach((ansik) => {
+                if(ansik.length<1) {
+                    alert('Error: Server sent less than expected');
+                    return;
+                }
                 var righte = answShift.shift();
                 switch(righte) {
                     case '1':
@@ -395,6 +399,9 @@
         if (img.length > 0) {
             console.log(img);
             img.forEach((im) => {
+                im.removeAttribute('width');
+                im.removeAttribute('height');
+                im.removeAttribute('alt');
                 im.setAttribute('hash',MD5(getImg(createView(), im)));
             });
         }
