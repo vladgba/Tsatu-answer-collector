@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name TsatuCheat
-// @version 1.0.3
+// @version 1.0.4
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @include http://nip.tsatu.edu.ua/*
@@ -9,7 +9,9 @@
 
 (function() {
     'use strict';
-    var haymaking=false;//enable automatic collection of responses from the account
+    var haymaking = false;//enable automatic collection of responses from the account
+    var haymlist = false;//dont turn on if there are a lot of tests
+    var autonext = false;
     console.log('script start');
     $(document).imagesLoaded( function() { Geheimwaffe(); });
     var Geheimwaffe = function() {
@@ -26,7 +28,12 @@
                 if (!/&showall=1$/.test(window.location.href))window.location.replace(window.location.href + '&showall=1');
                 else reviewPage();
             }
-
+            else if (/http:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/summary.php/.test(window.location.href)) {
+                if (autonext) {
+                    clkEnd();
+                    setTimeout(clkOvEnd, 100);
+                }
+            }
         }
     }
 
@@ -72,6 +79,12 @@
     var testList = function() {
         var hhg = document.querySelectorAll("li.quiz");
         hhg.forEach((el) => {
+            if(haymaking && haymlist){
+                var kh = el.querySelector("a");
+                if(kh!=null){
+                    window.open(kh.href);
+                }
+            }
             if (el.querySelectorAll(".isrestricted").length > 0) {
                 el.style = "background:#FF0000;color:#fff";
             } else {
@@ -81,6 +94,9 @@
             //if (/http:\/\/op\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(el.href))
             //el.style="background:#FF0000;color:#fff";
         });
+        if(haymaking && haymlist){
+            window.close();
+        }
         var tlist = document.querySelectorAll('li.quiz');
         var rid = window.location.href;//\/\/\/--------------------------------------------------------
         var arr = [];
@@ -101,6 +117,15 @@
 
     var testView = function() {
         console.log('testView');
+        if(haymaking){
+            var hg = document.querySelectorAll(".cell.lastcol");
+            if(hg.length<1) haymaking = false;
+            hg.forEach((el) => {
+                var ei = el.querySelector("a");
+                window.open(ei.href);
+            });
+        }
+        if(haymaking) window.close();
     }
     var lister;
     var attemptNext = function() {
@@ -114,24 +139,26 @@
         var butn = document.querySelector('.mod_quiz-next-nav');
         butn.setAttribute('type','button');
 
-        lister = document.querySelector('.mod_quiz-next-nav').addEventListener('click', (event) => {
-            document.querySelector('.mod_quiz-next-nav').removeEventListener('click', lister, false);
-            //event.preventDefault();
-            var checki = document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked');
-            if(checki.length<1) {
-                attemptNext();
-                return;
-            }
-            var cheans = [];
-            var ques = document.querySelector('.qtext').innerHTML;
-            checki.forEach((el) => {
-                cheans.push(el.parentNode.querySelector('label').innerHTML);
-            });
-            sendJson('attempt',{'que':ques,'ans':cheans},attemptNext);
-            //document.querySelector('.mod_quiz-next-nav').click();
-        });
+        lister = document.querySelector('.mod_quiz-next-nav').addEventListener('click', (event) => pressNext);
 
         getAnswers();
+    }
+
+    var pressNext = function() {
+        document.querySelector('.mod_quiz-next-nav').removeEventListener('click', lister, false);
+        //event.preventDefault();
+        var checki = document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked');
+        if(checki.length<1) {
+            attemptNext();
+            return;
+        }
+        var cheans = [];
+        var ques = document.querySelector('.qtext').innerHTML;
+        checki.forEach((el) => {
+            cheans.push(el.parentNode.querySelector('label').innerHTML);
+        });
+        sendJson('attempt',{'que':ques,'ans':cheans},attemptNext);
+        //document.querySelector('.mod_quiz-next-nav').click();
     }
 
     var testEnd = function() {
@@ -200,7 +227,11 @@
             console.log(content.push([Question, ans, RightAnswered, NonRightAnswered]));
         });
         console.log(content);
-        sendJson('answers',filterBlocks(content));
+        if(haymaking){
+            sendJson('answers',filterBlocks(content), window.close);
+        }else{
+            sendJson('answers',filterBlocks(content));
+        }
     }
     var filterBlocks = function(arr) {
         arr.forEach(function(v, i, a) {
@@ -345,7 +376,7 @@
         });
         getJson('answ',qparr,highlightAnswers);
     }
-
+    var answersclicked = false;
     var highlightAnswers = function (arr) {
         console.log(arr);
         var parts = document.querySelectorAll('.que');
@@ -376,6 +407,7 @@
                 var righte = answShift.shift();
                 switch(righte) {
                     case '1':
+                        answersclicked = true;
                         ansik.classList.add('answerednow');
                         ansik.style = "background:#00ff0c";
                         ansik.querySelector('input').click();
@@ -392,8 +424,60 @@
                 }
             });
 
+            if(!answersclicked){
+                var selected = part.querySelectorAll(".content [type=radio]:not(.badanswer)");
+                var selectedb = part.querySelectorAll(".content [type=checkbox]:not(.badanswer)");
+                var rp;
+                var rpw;
+                if (selectedb.length > 0) {
+                    rp = Math.floor(Math.random() * selectedb.length);
+                    selectedb[rp].click();
+                    rpw = rp;
+                    while (rpw == rp) {
+                        rpw = Math.floor(Math.random() * selectedb.length);
+                    }
+                    selectedb[rpw].click();
+                    console.log('%%' + selectedb[rpw]);
+                    pressNext();
+                    autonext=false;
+                } else {
+                    if (selected.length > 0) {
+                        rp = Math.floor(Math.random() * selected.length);
+                        selected[rp].click();
+                        console.log('%%$');
+                        console.log(selectedb);
+                        //pressNext();
+                    } else {
+                        alert("Error: can't determine type of question");
+                    }
+                }
+            }
+
+        });
+        if(autonext){
+            pressNext();
+        }
+    }
+
+    var clkEnd = function() {
+        var tmp = document.querySelectorAll(".submitbtns.mdl-align");
+        console.log(tmp);
+        tmp.forEach((el) => {
+            console.log("----");
+            if (el.querySelector("input[name=finishattempt]") !== null) {
+                if (/http:\/\/nip/.test(w.location.href)) {
+                    el.querySelector("input[type=submit]").click();
+                } else {
+                    el.querySelector("button").click();
+                }
+            } else console.log("fff");
         });
     }
+    var clkOvEnd = function() {
+        var q = document.querySelector(".moodle-dialogue input");
+        if (q !== null) q.click();
+    }
+
     var filterImgs = function(part) {
         var img = part.querySelectorAll('img');
         if (img.length > 0) {
