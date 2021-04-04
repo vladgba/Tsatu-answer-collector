@@ -134,16 +134,6 @@
         butn.setAttribute('type','submit');
         butn.click();
     }
-    var testAttempt = function() {
-        console.log('testAttempt');
-        var butn = document.querySelector('.mod_quiz-next-nav');
-        butn.setAttribute('type','button');
-
-        lister = document.querySelector('.mod_quiz-next-nav').addEventListener('click', (event) => pressNext);
-
-        getAnswers();
-    }
-
     var pressNext = function() {
         document.querySelector('.mod_quiz-next-nav').removeEventListener('click', lister, false);
         //event.preventDefault();
@@ -160,6 +150,18 @@
         sendJson('attempt',{'que':ques,'ans':cheans},attemptNext);
         //document.querySelector('.mod_quiz-next-nav').click();
     }
+    var testAttempt = function() {
+        console.log('testAttempt');
+        var butn = document.querySelector('.mod_quiz-next-nav');
+        butn.setAttribute('type','button');
+
+        lister = document.querySelector('.mod_quiz-next-nav').addEventListener('click', (event) => {
+            pressNext();//I don't know why, but it doesn't work directly
+        });
+
+        getAnswers();
+    }
+
 
     var testEnd = function() {
         console.log('testEnd');
