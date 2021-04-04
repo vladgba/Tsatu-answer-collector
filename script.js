@@ -11,7 +11,7 @@
     'use strict';
     var haymaking = false;//enable automatic collection of responses from the account
     var haymlist = false;//dont turn on if there are a lot of tests
-    var autonext = false;
+    var autonext = false;// true / false
     console.log('script start');
     $(document).imagesLoaded( function() { Geheimwaffe(); });
     var Geheimwaffe = function() {
@@ -385,79 +385,82 @@
         console.log('#todo: i know it is wrong, but it works');
 
         parts.forEach((part) => {
-            if(arr.length<1) return;
-            var answShift = arr.shift();
-            console.log(answShift);
+            randomClick(part);
+            if(arr.length>0){
+                var answShift = arr.shift();
+                console.log(answShift);
 
-            if(answShift.length<1) return;
-            //localAnswers
-            if(typeof(answShift) == "undefined" || answShift === null) return;
-            if(false && answShift[0].localeCompare('text')==0) {
-                var blockdd = document.createElement("p");
-                blockdd.innerHTML = answShift[1];
-                part.insertBefore(blockdd, part.firstChild);
-                return;
-            }
-            var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
-            //var answinpttext = part.querySelector('input[type="text"]');
-
-            Answers.forEach((ansik) => {
-                if(ansik.length<1) {
-                    alert('Error: Server sent less than expected');
+                if(answShift.length<1) return;
+                //localAnswers
+                if(typeof(answShift) == "undefined" || answShift === null) return;
+                if(false && answShift[0].localeCompare('text')==0) {
+                    var blockdd = document.createElement("p");
+                    blockdd.innerHTML = answShift[1];
+                    part.insertBefore(blockdd, part.firstChild);
                     return;
                 }
-                var righte = answShift.shift();
-                switch(righte) {
-                    case '1':
-                        answersclicked = true;
-                        ansik.classList.add('answerednow');
-                        ansik.style = "background:#00ff0c";
-                        ansik.querySelector('input').click();
-                        break;
+                var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
+                //var answinpttext = part.querySelector('input[type="text"]');
 
-                    case '2':
-                        ansik.classList.add('badanswer');
-                        ansik.style = "background:#ff7a7a";
-                        break;
-
-                    default:
-                        ansik.style = "background:#fff";
-                        break;
-                }
-            });
-
-            if(!answersclicked){
-                var selected = part.querySelectorAll(".content [type=radio]:not(.badanswer)");
-                var selectedb = part.querySelectorAll(".content [type=checkbox]:not(.badanswer)");
-                var rp;
-                var rpw;
-                if (selectedb.length > 0) {
-                    rp = Math.floor(Math.random() * selectedb.length);
-                    selectedb[rp].click();
-                    rpw = rp;
-                    while (rpw == rp) {
-                        rpw = Math.floor(Math.random() * selectedb.length);
+                Answers.forEach((ansik) => {
+                    if(ansik.length<1) {
+                        alert('Error: Server sent less than expected');
+                        return;
                     }
-                    selectedb[rpw].click();
-                    console.log('%%' + selectedb[rpw]);
-                    pressNext();
-                    autonext=false;
-                } else {
-                    if (selected.length > 0) {
-                        rp = Math.floor(Math.random() * selected.length);
-                        selected[rp].click();
-                        console.log('%%$');
-                        console.log(selectedb);
-                        //pressNext();
-                    } else {
-                        alert("Error: can't determine type of question");
+                    var righte = answShift.shift();
+                    switch(righte) {
+                        case '1':
+                            answersclicked = true;
+                            ansik.classList.add('answerednow');
+                            ansik.style = "background:#00ff0c";
+                            ansik.querySelector('input').click();
+                            break;
+
+                        case '2':
+                            ansik.classList.add('badanswer');
+                            ansik.style = "background:#ff7a7a";
+                            break;
+
+                        default:
+                            ansik.style = "background:#fff";
+                            break;
                     }
-                }
+                });
             }
 
         });
         if(autonext){
             pressNext();
+        }
+    }
+    var randomClick = function (part) {
+        if(!answersclicked){
+            var selected = part.querySelectorAll(".r0 [type=radio]:not(.badanswer),.r1 [type=radio]:not(.badanswer)");
+            var selectedb = part.querySelectorAll(".r0 [type=checkbox]:not(.badanswer),.r1 [type=checkbox]:not(.badanswer)");
+            var rp;
+            var rpw;
+            if (selectedb.length > 0) {
+                rp = Math.floor(Math.random() * selectedb.length);
+                selectedb[rp].click();
+                rpw = rp;
+                while (rpw == rp) {
+                    rpw = Math.floor(Math.random() * selectedb.length);
+                }
+                selectedb[rpw].click();
+                console.log('%%' + selectedb[rpw]);
+                pressNext();
+                autonext=false;
+            } else {
+                if (selected.length > 0) {
+                    rp = Math.floor(Math.random() * selected.length);
+                    selected[rp].click();
+                    console.log('%%$');
+                    console.log(selectedb);
+                    //pressNext();
+                } else {
+                    alert("Error: can't determine type of question");
+                }
+            }
         }
     }
 
