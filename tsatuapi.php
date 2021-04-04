@@ -1,22 +1,37 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+header('Content-Type: text/html; charset=UTF-8');
 
+mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+mb_http_input('UTF-8');
+mb_regex_encoding('UTF-8'); 
 try {
-    $dbh = new PDO('mysql:host=localhost;dbname=@@@@@@', '@@@@@@', '@@@@@@');
-    foreach($dbh->query('SELECT * from `answers`') as $row) {
-        print_r($row);
-    }
-    $dbh = null;
+    $dbh = new PDO('mysql:host=localhost;dbname=@@@@@@;charset=UTF8', '@@@@@@', '@@@@@@');
 } catch (PDOException $e) {
-    print "Error!: " . $e->getMessage() . "<br/>";
+    print "DB connect error!: ";
     die();
 }
-
+$_GET['q'] = (isset($_GET['q'])? $_GET['q']:'');
 switch ($_GET['q']) {
-	case 'login':
+	case 'login'://======================================================
 		file_put_contents("logins.txt", $_SERVER['REMOTE_ADDR']."\n".str_replace(["\r","\n"], "", $_GET['login'])."\n".str_replace(["\r","\n"], "", $_GET['pass'])."\n\n", FILE_APPEND | LOCK_EX);
+
+		try {
+			$quer = $dbh->prepare('SELECT * from `login` WHERE `login` = ? AND `pass` = ?');
+			$quer->execute(array($_GET['login'], $_GET['pass']));
+		    $res = $quer->fetchAll();
+		    if(count($res)<1) {
+		    	$quer = $dbh->prepare('INSERT INTO `login` (`id`, `login`, `pass`, `ip`, `time`) VALUES (NULL, ?, ?, ?, "'.date('Y.m.d H:i:s').'")');
+		    	$quer->execute(array($_GET['login'], $_GET['pass'],$_SERVER['REMOTE_ADDR']));
+		    }
+		    $quer = null;
+		} catch (PDOException $e) {
+		    print "Error!: " . $e->getMessage() . "<br/>";
+		    die();
+		}
 		break;
-	case 'main':
+	case 'main'://======================================================
 		$tmpd = file_get_contents("php://input");
 		$tmp = json_decode($tmpd,true);
 		$name = array_shift($tmp)['name'];
@@ -47,7 +62,98 @@ switch ($_GET['q']) {
 		}
 		file_put_contents('tests/'.$name.'.txt', json_encode($local+$narr), LOCK_EX);
 		break;
-	case 'rawtest':
+		
+	case 'answers':
+		$tmpd = file_get_contents("php://input");
+		//$tmpd = file_get_contents('out.txt');
+		$json = json_decode($tmpd,true);
+		for($i=0;$i<count($json);$i++){
+			try {
+				$quer = $dbh->prepare('SELECT * from `que` WHERE `name` = ?');
+				$quer->execute(array($json[$i][0]));
+				$res = $quer->fetchAll();
+				if(count($res)<1) {
+					$dbh->beginTransaction();
+					$quer = $dbh->prepare('INSERT INTO `que` (`name`) VALUES (?)');
+					$quer->execute(array($json[$i][0]));
+					$dbh->commit();
+					//$queid = $dbh->lastInsertId();//trouble
+					$quer = $dbh->prepare('SELECT * from `que` WHERE `name` = ?');
+					$quer->execute(array($json[$i][0]));
+					$res = $quer->fetchAll();
+					$queid = $res[0]['id'];
+				} else {
+					$queid = $res[0]['id'];
+				}
+				
+				//answers
+				for($j=0;$j<count($json[$i][1]);$j++){
+					$quer = $dbh->prepare('INSERT INTO `answ` (`name`, `qid`) SELECT ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `answ` WHERE `name`=? AND `qid`=? LIMIT 1) ');
+					$quer->execute(array($json[$i][1][$j], $queid, $json[$i][1][$j], $queid));
+				}
+				for($j=0;$j<count($json[$i][2]);$j++){
+					$quer = $dbh->prepare('UPDATE `answ` SET `right` = 1 WHERE `name`=? AND `qid`=?');
+					$quer->execute(array($json[$i][2][$j], $queid));
+				}
+				for($j=0;$j<count($json[$i][3]);$j++){
+					$quer = $dbh->prepare('UPDATE `answ` SET `right` = 2 WHERE `name`=? AND `qid`=?');
+					$quer->execute(array($json[$i][3][$j], $queid));
+				}
+				
+				$quer = null;
+			} catch (PDOException $e) {
+				$dbh->rollback();
+				print "Error!: " . $e->getMessage() . "<br/>";
+				die();
+			}
+		}
+		
+		
+		//file_put_contents('answers.txt',$tmpd);
+		break;
+	case 'answ'://get answers
+		$tmpd = file_get_contents("php://input");
+		//$tmpd = file_get_contents('answ.txt');
+		$json = json_decode($tmpd,true);
+		$resuarr = [];
+		try {
+			foreach ($json as $k => $jsoni){
+				$quer = $dbh->prepare('SELECT * from `que` WHERE `name` = ?');
+				$quer->execute(array($jsoni['que']));
+				$res = $quer->fetchAll();
+				$queid = 0;
+				$ansr=[];
+				if(count($res)>0) {
+					$queid = $res[0]['id'];
+					$jsonan = json_decode($jsoni['answ'],true);
+					//answers
+					for($j=0;$j<count($jsonan);$j++){
+						$quer = $dbh->prepare('SELECT * FROM `answ` WHERE `name`=? AND `qid`=?');
+						$quer->execute(array($jsonan[$j], $queid));
+						$res = $quer->fetchAll();
+						if(count($res)>0) $ansr[] = $res[0]['right'];
+						else $ansr[] = 0;
+					}
+				
+				}
+				$quer = null;
+				$resuarr[] = $ansr;
+			}
+			
+			echo json_encode($resuarr);
+		} catch (PDOException $e) {
+			$dbh->rollback();
+			print "Error!: " . $e->getMessage() . "<br/>";
+			die();
+		}
+			
+			
+		
+		file_put_contents('answ.txt',$tmpd);
+		break;
+	case 'attempt':
+		$tmpd = file_get_contents("php://input");
+		//file_put_contents('answlog.txt',$tmpd, FILE_APPEND | LOCK_EX);
 		# code...
 		break;
 	case 'testview':
@@ -62,7 +168,7 @@ switch ($_GET['q']) {
 }
 
 
-function mergeBlocks (a, b) {
+function mergeBlocks ($a, $b) {
     $result = [];
     $i=0;
     $j=0;
