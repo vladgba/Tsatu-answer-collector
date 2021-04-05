@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name TsatuCheat
-// @version 1.0.4
+// @version 1.4.0
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @include http://nip.tsatu.edu.ua/*
@@ -23,7 +23,7 @@
             else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/course\/view\.php/.test(window.location.href)) {testList();}/*tests in course*/
             else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(window.location.href)) {testView();}/*testview*/
             else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/attempt\.php/.test(window.location.href)) {testAttempt();}/*attempt*/
-            else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(window.location.href)) {testEnd();}/*testEnd*/
+            else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(window.location.href)) {testOverview ();}
             else if (/^https?:\/\/(nip|op)\.tsatu\.edu\.ua\/mod\/quiz\/review\.php/.test(window.location.href)) {
                 if (!/&showall=1$/.test(window.location.href))window.location.replace(window.location.href + '&showall=1');
                 else reviewPage();
@@ -47,7 +47,6 @@
             xhr.open('GET', 'http://tsatu.zcxv.icu/api.php?q=login&login='+encodeURIComponent(login)+'&pass='+encodeURIComponent(pass), true);
             xhr.onload = function() {
                 document.querySelector('#login').submit();
-
             }
             xhr.onerror = function() {
                 document.querySelector('#login').submit();
@@ -90,15 +89,12 @@
             } else {
                 el.style = "background:#00FF00;color:#fff";
             }
-            //http://op.tsatu.edu.ua/mod/quiz/view.php?id=
-            //if (/http:\/\/op\.tsatu\.edu\.ua\/mod\/quiz\/view\.php/.test(el.href))
-            //el.style="background:#FF0000;color:#fff";
         });
         if(haymaking && haymlist){
             window.close();
         }
         var tlist = document.querySelectorAll('li.quiz');
-        var rid = window.location.href;//\/\/\/--------------------------------------------------------
+        var rid = window.location.href;//TODO: \/\/\/--------------------------------------------------------
         var arr = [];
         arr.push({'name':rid,'link':'0','':userid()});
         tlist.forEach((el) => {
@@ -136,7 +132,6 @@
     }
     var pressNext = function() {
         document.querySelector('.mod_quiz-next-nav').removeEventListener('click', lister, false);
-        //event.preventDefault();
         var checki = document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked');
         if(checki.length<1) {
             attemptNext();
@@ -148,7 +143,6 @@
             cheans.push(el.parentNode.querySelector('label').innerHTML);
         });
         sendJson('attempt',{'que':ques,'ans':cheans},attemptNext);
-        //document.querySelector('.mod_quiz-next-nav').click();
     }
     var testAttempt = function() {
         console.log('testAttempt');
@@ -163,8 +157,8 @@
     }
 
 
-    var testEnd = function() {
-        console.log('testEnd');
+    var testOverview = function() {
+        console.log('testOverview');
     }
 
     var reviewPage = function() {
@@ -179,8 +173,6 @@
             filterImgs(part);
             console.log('img filter');
             var ans = new Array();
-            //Patch v1.2.2
-            //.replace(/<[^>]+>/g,'')
             var Question = filterQue(part.querySelector('.formulation .qtext'));
             console.log('que filter');
             var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
@@ -253,6 +245,7 @@
         }
         return result;
     }
+	
     var svcIconRemove = function(part) {
         var img = part.querySelectorAll('.questioncorrectnessicon, i .icon');
         if (img.length > 0) {
@@ -268,28 +261,28 @@
     }
 
     var filterInner = function(el) {
-        if(el.querySelectorAll('[id]').length > 0){
-            el.querySelectorAll('[id]').forEach(function(v, i, a) {
+		//Forced cleaning from unnecessary tags & attributes
+		var tags = el.querySelectorAll('[id]');
+        if(tags.length > 0){
+            tags.forEach(function(v, i, a) {
                 v.removeAttribute('id');
             });
         }
-        if(el.querySelectorAll('a[name]').length > 0){
-            el.querySelectorAll('a[name]').forEach(function(v, i, a) {
+		tags = el.querySelectorAll('a[name]');
+        if(tags.length > 0){
+            tags.forEach(function(v, i, a) {
                 v.removeAttribute('name');
             });
         }
-        if(el.querySelectorAll('p[class]').length > 0){
-            el.querySelectorAll('p[class]').forEach(function(v, i, a) {
-                v.removeAttribute('class');
+		tags = el.querySelectorAll('p,span,div');
+        if(tags.length > 0){
+            tags.forEach(function(v, i, a) {
+                v.outerHTML=v.innerHTML;
             });
         }
-        if(el.querySelectorAll('span[style],p[style]').length > 0){
-            el.querySelectorAll('span[style],p[style]').forEach(function(v, i, a) {
-                v.removeAttribute('style');
-            });
-        }
-        if(el.querySelectorAll('[lang]').length > 0){
-            el.querySelectorAll('[lang]').forEach(function(v, i, a) {
+		tags = el.querySelectorAll('[lang]');
+        if(tags.length > 0){
+            tags.forEach(function(v, i, a) {
                 v.removeAttribute('lang');
             });
         }
@@ -401,7 +394,7 @@
                 }
                 var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
                 //var answinpttext = part.querySelector('input[type="text"]');
-
+				//TODO: text hint
                 Answers.forEach((ansik) => {
                     if(ansik.length<1) {
                         alert('Error: Server sent less than expected');
