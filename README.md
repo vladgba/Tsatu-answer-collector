@@ -2,6 +2,8 @@
  Скрипт помощи с ответами на портале ТГАТУ (ТДАТУ)
 - для освітнього порталу - op.tsatu.edu.ua 
 
+Требуется [Tampermonkey](https://tampermonkey.net/) или [Greasemonkey](https://www.greasespot.net/) или [Violentmonkey](https://violentmonkey.github.io/get-it/) или другое расширение браузера для поддержки userscript.
+
 Required [Tampermonkey](https://tampermonkey.net/) or [Greasemonkey](https://www.greasespot.net/) or [Violentmonkey](https://violentmonkey.github.io/get-it/) or another browser extension for userscript support.
 Tampermonkey: 
 - [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/)
