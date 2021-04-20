@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name TsatuCheat
-// @version 1.4.0
+// @version 1.4.1
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @include http://nip.tsatu.edu.ua/*
@@ -123,13 +123,16 @@
         }
         if(haymaking) window.close();
     }
+
     var lister;
+
     var attemptNext = function() {
         console.log('testAttemptNext');
         var butn = document.querySelector('.mod_quiz-next-nav');
         butn.setAttribute('type','submit');
         butn.click();
     }
+
     var pressNext = function() {
         document.querySelector('.mod_quiz-next-nav').removeEventListener('click', lister, false);
         var checki = document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked');
@@ -144,6 +147,7 @@
         });
         sendJson('attempt',{'que':ques,'ans':cheans},attemptNext);
     }
+
     var testAttempt = function() {
         console.log('testAttempt');
         var butn = document.querySelector('.mod_quiz-next-nav');
@@ -163,11 +167,8 @@
 
     var reviewPage = function() {
         console.log('reviewPage');
-
         var content = [];
-        console.log('parseFinish');
         var Questions = document.querySelectorAll('.que');
-        console.log('que all');
         Questions.forEach((part) => {
             svcIconRemove(part);
             filterImgs(part);
@@ -217,16 +218,16 @@
             } else {
                 RightAnswered.push(filterRightanswer(RightAnswer));
             }
-            console.log([Question, ans, RightAnswered, NonRightAnswered]);
-            console.log(content.push([Question, ans, RightAnswered, NonRightAnswered]));
+            console.warn([Question, ans, RightAnswered, NonRightAnswered]);
+            content.push([Question, ans, RightAnswered, NonRightAnswered]);
         });
-        console.log(content);
         if(haymaking){
             sendJson('answers',filterBlocks(content), window.close);
         }else{
             sendJson('answers',filterBlocks(content));
         }
     }
+
     var filterBlocks = function(arr) {
         arr.forEach(function(v, i, a) {
             v[1] = unique(v[1]);
@@ -245,7 +246,7 @@
         }
         return result;
     }
-	
+
     var svcIconRemove = function(part) {
         var img = part.querySelectorAll('.questioncorrectnessicon, i .icon');
         if (img.length > 0) {
@@ -261,26 +262,36 @@
     }
 
     var filterInner = function(el) {
-		//Forced cleaning from unnecessary tags & attributes
-		var tags = el.querySelectorAll('[id]');
+        //Forced cleaning from unnecessary tags & attributes
+        var tags;
+        while((tags = el.querySelector('p,span,div,i'))!==null) {
+            tags.outerHTML=tags.innerHTML;
+        }
+        tags = el.querySelectorAll('[id]');
         if(tags.length > 0){
             tags.forEach(function(v, i, a) {
                 v.removeAttribute('id');
             });
         }
-		tags = el.querySelectorAll('a[name]');
+        tags = el.querySelectorAll('[class]');
+        if(tags.length > 0){
+            tags.forEach(function(v, i, a) {
+                v.removeAttribute('class');
+            });
+        }
+        tags = el.querySelectorAll('[style]');
+        if(tags.length > 0){
+            tags.forEach(function(v, i, a) {
+                v.removeAttribute('style');
+            });
+        }
+        tags = el.querySelectorAll('a[name]');
         if(tags.length > 0){
             tags.forEach(function(v, i, a) {
                 v.removeAttribute('name');
             });
         }
-		tags = el.querySelectorAll('p,span,div');
-        if(tags.length > 0){
-            tags.forEach(function(v, i, a) {
-                v.outerHTML=v.innerHTML;
-            });
-        }
-		tags = el.querySelectorAll('[lang]');
+        tags = el.querySelectorAll('[lang]');
         if(tags.length > 0){
             tags.forEach(function(v, i, a) {
                 v.removeAttribute('lang');
@@ -289,7 +300,7 @@
     }
 
     var filterText = function(a) {
-        return a.trim().replace(/\.$/, '').replace(/\s\s+/g, ' ');
+        return a.replace(/(«|»|"|'|‘|’|“|”|„)+/, '"').replace(/&nbsp;/, ' ').replace(/(\r|\n)+/, ' ').replace(/\.$/, '').replace(/\s\s+/g, ' ').trim();
     }
 
     var filterAnswer = function (el) {
@@ -318,6 +329,7 @@
     }
 
     var sendJson = function(q,data,cb=null) {
+        console.log('Send:');
         console.log(data);
         var xhr = new XMLHttpRequest();
         var theUrl = 'http://tsatu.zcxv.icu/api.php?q='+q;
@@ -329,7 +341,7 @@
             if(cb!=null) cb();
         }
         xhr.onerror = function() {
-            console.log(xhr.response);
+            console.error(xhr.response);
             alert('Error: Not sent');
         }
         xhr.send(JSON.stringify(data));
@@ -345,7 +357,7 @@
             var jsonResponse = cb(JSON.parse(xhr.response));
         }
         xhr.onerror = function() {
-            console.log(xhr.response);
+            console.error(xhr.response);
             alert('Error (get): Not sent');
         }
         xhr.send(JSON.stringify(data));
@@ -360,20 +372,22 @@
             //Selectors
             var Quest = part.querySelector('.formulation .qtext');
             var Answ = part.querySelectorAll('.formulation .r0, .formulation .r1');
-            console.log('Check que');
             var Question = filterQue(Quest);
+            console.warn('Chk Que:');
+            console.log(Question);
             var AnswRaw = [];
             Answ.forEach((part) => {
                 AnswRaw.push(filterAnswer(part));
             });
-            console.log(Question);
             qparr.push({'que':Question, 'answ':JSON.stringify(AnswRaw)});
         });
         getJson('answ',qparr,highlightAnswers);
     }
+
     var answersclicked = false;
+
     var highlightAnswers = function (arr) {
-        console.log(arr);
+        console.warn(arr);
         var parts = document.querySelectorAll('.que');
         console.log('#todo: i know it is wrong, but it works');
 
@@ -394,7 +408,7 @@
                 }
                 var Answers = part.querySelectorAll('.formulation .r0, .formulation .r1');
                 //var answinpttext = part.querySelector('input[type="text"]');
-				//TODO: text hint
+                //TODO: text hint
                 Answers.forEach((ansik) => {
                     if(ansik.length<1) {
                         alert('Error: Server sent less than expected');
@@ -426,7 +440,9 @@
             pressNext();
         }
     }
+
     var randomClick = function (part) {
+        console.warn('Random');
         if(!answersclicked){
             var selected = part.querySelectorAll(".r0 [type=radio]:not(.badanswer),.r1 [type=radio]:not(.badanswer)");
             var selectedb = part.querySelectorAll(".r0 [type=checkbox]:not(.badanswer),.r1 [type=checkbox]:not(.badanswer)");
@@ -479,7 +495,7 @@
     var filterImgs = function(part) {
         var img = part.querySelectorAll('img');
         if (img.length > 0) {
-            console.log(img);
+            console.warn(img);
             img.forEach((im) => {
                 im.removeAttribute('width');
                 im.removeAttribute('height');
@@ -504,12 +520,10 @@
             alert('Why were not the images downloaded?');
         }
         return done();
-        //}
         function done() {
             c.width = im.width;
             c.height = im.height;
             context.drawImage(im, 0, 0);
-            console.log(c.toDataURL());
             return c.toDataURL();
         }
     }
@@ -592,6 +606,7 @@
             return usid;
         }
     };
+
     var getuserblock = function () {
         var ustext = document.querySelector('.usertext');
         if (ustext === null) {
