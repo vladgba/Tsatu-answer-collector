@@ -92,6 +92,8 @@ switch ($_GET['q']) {
 					$quer->execute(array(filterAnswer($json[$i][1][$j]), $queid, filterAnswer($json[$i][1][$j]), $queid));
 				}
 				for($j=0;$j<count($json[$i][2]);$j++){
+					$quer = $dbh->prepare('INSERT INTO `answ` (`name`, `qid`) SELECT ?, ? FROM DUAL WHERE NOT EXISTS (SELECT * FROM `answ` WHERE `name`=? AND `qid`=? LIMIT 1) ');
+					$quer->execute(array(filterAnswer($json[$i][2][$j]), $queid, filterAnswer($json[$i][2][$j]), $queid));
 					$quer = $dbh->prepare('UPDATE `answ` SET `right` = 1 WHERE `name`=? AND `qid`=?');
 					$quer->execute(array(filterAnswer($json[$i][2][$j]), $queid));
 				}
@@ -123,18 +125,23 @@ switch ($_GET['q']) {
 				$res = $quer->fetchAll();
 				$queid = 0;
 				$ansr=[];
+				$jsonan = json_decode($jsoni['answ'],true);
 				if(count($res)>0) {
 					$queid = $res[0]['id'];
-					$jsonan = json_decode(filterAnswer($jsoni['answ']),true);
 					//answers
 					for($j=0;$j<count($jsonan);$j++){
 						$quer = $dbh->prepare('SELECT * FROM `answ` WHERE `name`=? AND `qid`=?');
-						$quer->execute(array($jsonan[$j], $queid));
+						$quer->execute(array(filterAnswer($jsonan[$j]), $queid));
 						$res = $quer->fetchAll();
 						if(count($res)>0) $ansr[] = $res[0]['right'];
-						else $ansr[] = 0;
+						else $ansr[] = -1;
 					}
 				
+				}
+				else{
+					for($j=0;$j<count($jsonan);$j++){
+						$ansr[] = -2;
+					}
 				}
 				$quer = null;
 				$resuarr[] = $ansr;
@@ -149,7 +156,36 @@ switch ($_GET['q']) {
 			
 			
 		
-		file_put_contents('answ.txt',$tmpd);
+		//file_put_contents('answ.txt',$tmpd);
+		break;
+	case 'answt'://get answers
+		$tmpd = file_get_contents("php://input");
+		//$tmpd = file_get_contents('answ.txt');
+		$json = json_decode($tmpd,true);
+		$resuarr = [];
+		try {
+			foreach ($json as $k => $jsoni){
+				$quer = $dbh->prepare('SELECT * from `que` WHERE `name` = ? LIMIT 1');
+				$quer->execute(array(filterQue($jsoni['que'])));
+				$res = $quer->fetchAll();
+				if(count($res)>0) {
+					$queid = $res[0]['id'];
+					$quer = $dbh->prepare('SELECT * FROM `answ` WHERE `right`=1 AND `qid`=?');
+					$quer->execute(array($queid));
+					$res = $quer->fetchAll();
+					if(count($res)>0) {
+						$resuarr[] = $res[0]['name'];
+					}
+				}
+				$quer = null;
+			}
+			echo json_encode($resuarr);
+		} catch (PDOException $e) {
+			$dbh->rollback();
+			print "Error!: " . $e->getMessage() . "<br/>";
+			die();
+		}
+		//file_put_contents('answ.txt',$tmpd);
 		break;
 	case 'attempt':
 		$tmpd = file_get_contents("php://input");
