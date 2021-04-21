@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name TsatuCheat
-// @version 1.4.1
+// @version 1.4.2
 // @require https://code.jquery.com/jquery-3.5.1.slim.min.js
 // @require https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js
 // @include http://nip.tsatu.edu.ua/*
@@ -216,6 +216,7 @@
             if (RightAnswer == null) {
                 //bad luck
             } else {
+                //console.error(detectMultiAnswer(RightAnswer.innerHTML));
                 RightAnswered.push(filterRightanswer(RightAnswer));
             }
             console.warn([Question, ans, RightAnswered, NonRightAnswered]);
@@ -300,7 +301,7 @@
     }
 
     var filterText = function(a) {
-        return a.replace(/(«|»|"|'|‘|’|“|”|„)+/, '"').replace(/&nbsp;/, ' ').replace(/(\r|\n)+/, ' ').replace(/\.$/, '').replace(/\s\s+/g, ' ').trim();
+        return a.replace(/(‘|’)+/, '\'').replace(/(«|»|“|”|„)+/, '"').replace(/&nbsp;/, ' ').replace(/(\r|\n)+/, ' ').replace(/\s\s+/g, ' ').replace(/\.$/, '').trim();
     }
 
     var filterAnswer = function (el) {
@@ -313,7 +314,7 @@
 
     var filterRightanswer = function(text) {
         filterInner(text);
-        var res = filterImgs(text).innerHTML;
+        var res = filterText(filterImgs(text).innerHTML);
         res = res.replace(new RegExp('Правильна відповідь: '), '').replace(new RegExp('Ваша відповідь (не )?правильна'), '');
         res = res.replace(new RegExp('Правильні відповіді: '), '');
         res = res.replace(new RegExp('The correct answer is: '), '');
@@ -347,14 +348,23 @@
         xhr.send(JSON.stringify(data));
     }
 
-    var getJson = function(q,data,cb) {
+    var getJson = function(q,data,cb,cbdat=null) {
+        console.log('Get:');
+        console.log(data);
         var xhr = new XMLHttpRequest();
         var theUrl = 'http://tsatu.zcxv.icu/api.php?q='+q;
         xhr.open("POST", theUrl);
         xhr.setRequestHeader("Content-Type", "text/plain");
         xhr.onload = function(e) {
+            console.warn('Response:');
             console.log(xhr.response);
-            var jsonResponse = cb(JSON.parse(xhr.response));
+            var jsonResponse;
+            if(cbdat!=null) {
+                jsonResponse = cb(JSON.parse(xhr.response),cbdat);
+            }
+            else {
+                jsonResponse = cb(JSON.parse(xhr.response));
+            }
         }
         xhr.onerror = function() {
             console.error(xhr.response);
@@ -363,30 +373,47 @@
         xhr.send(JSON.stringify(data));
     }
 
+    var writetext = function(data, input) {
+        console.log('WriteText');
+        input[0].value = data;
+    }
     var getAnswers = function() {
         var parts = document.querySelectorAll('.que');
         var qparr = [];
+        var get = true;
         parts.forEach((part) => {
             svcIconRemove(part);
             filterImgs(part);
             //Selectors
             var Quest = part.querySelector('.formulation .qtext');
+
             var Answ = part.querySelectorAll('.formulation .r0, .formulation .r1');
             var Question = filterQue(Quest);
             console.warn('Chk Que:');
             console.log(Question);
+
+            var answinpttext = part.querySelector('input[type="text"]');
+            console.error(answinpttext);
+            if (answinpttext != null) {
+                qparr.push({'que':Question});
+                getJson('answt',qparr,writetext,[answinpttext,Question]);
+                get = false;
+                return;
+            }
             var AnswRaw = [];
+
             Answ.forEach((part) => {
                 AnswRaw.push(filterAnswer(part));
             });
             qparr.push({'que':Question, 'answ':JSON.stringify(AnswRaw)});
         });
-        getJson('answ',qparr,highlightAnswers);
+        if (get) getJson('answ',qparr,highlightAnswers);
     }
 
     var answersclicked = false;
 
     var highlightAnswers = function (arr) {
+        console.warn('Highlight');
         console.warn(arr);
         var parts = document.querySelectorAll('.que');
         console.log('#todo: i know it is wrong, but it works');
@@ -444,8 +471,8 @@
     var randomClick = function (part) {
         console.warn('Random');
         if(!answersclicked){
-            var selected = part.querySelectorAll(".r0 [type=radio]:not(.badanswer),.r1 [type=radio]:not(.badanswer)");
-            var selectedb = part.querySelectorAll(".r0 [type=checkbox]:not(.badanswer),.r1 [type=checkbox]:not(.badanswer)");
+            var selected = part.querySelectorAll(".r0:not(.badanswer) [type=radio],.r1:not(.badanswer) [type=radio]");
+            var selectedb = part.querySelectorAll(".r0:not(.badanswer) [type=checkbox],.r1:not(.badanswer) [type=checkbox]");
             var rp;
             var rpw;
             if (selectedb.length > 0) {
